@@ -3,12 +3,15 @@ import Filter from './components/Filter'
 import PersonForm from './components/PersonForm'
 import Persons from './components/Persons'
 import personService from './services/persons'
+import Notification from './components/Notification'
 
 const App = () => {
   const [persons, setPersons] = useState([])
   const [newName, setNewName] = useState('')
   const [newNumber, setNewNumber] = useState('')
   const [filter, setFilter] = useState('')
+  const [errorMessage, setErrorMessage] = useState(null)
+  const [isError, setIsError] = useState(false)
 
   useEffect(() => {
     personService
@@ -41,14 +44,25 @@ const App = () => {
         personService
           .update(samePerson.id, changedPerson)
           .then(returnedPerson => {
+            setErrorMessage(
+              `${returnedPerson.name}'s number is changed`
+            )
+            setTimeout(() => {
+              setErrorMessage(null)
+            }, 5000)
+            setIsError(false)
             setPersons(persons.map(person => person.id !== samePerson.id ? person : returnedPerson))
             setNewName('')
             setNewNumber('')
           })
           .catch(error => {
-            alert(
-              `the person ${samePerson.name} was already deleted from the server`
+            setErrorMessage(
+              `Information of ${samePerson.name} has already been removed from server`
             )
+            setTimeout(() => {
+              setErrorMessage(null)
+            }, 5000)
+            setIsError(true)
             setPersons(persons.filter(person => person.id !== samePerson.id))
             setNewName('')
             setNewNumber('')
@@ -65,6 +79,13 @@ const App = () => {
     personService
       .create(personObject)
       .then(returnedPerson => {
+        setErrorMessage(
+          `Added ${returnedPerson.name}`
+        )
+        setTimeout(() => {
+          setErrorMessage(null)
+        }, 5000)
+        setIsError(false)
         setPersons(persons.concat(returnedPerson))
         setNewName('')
         setNewNumber('')
@@ -87,6 +108,11 @@ const App = () => {
   return (
     <div>
       <h2>Phonebook</h2>
+
+      <Notification 
+        message={errorMessage} 
+        isError={isError}
+      />
       
       <Filter 
         value={filter}
