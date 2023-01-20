@@ -1,0 +1,9 @@
+POST http://localhost:3003/api/blogs
+Content-Type: application/json
+
+{
+    "title": "Super Robot Wars Z2",
+    "author": "Caphi",
+    "url": "https://lparchive.org/Super-Robot-Wars-Z2-Destruction/Update%2022/",
+    "likes": 500
+}
