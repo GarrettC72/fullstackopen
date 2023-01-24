@@ -39,11 +39,25 @@ const initialBlogs = [
   }
 ]
 
+const nonExistingId = async () => {
+  const blog = new Blog({
+    title: 'Functional Classes',
+    author: 'Robert C. Martin',
+    url: 'http://blog.cleancoder.com/uncle-bob/2023/01/18/functional-classes.html',
+    likes: 4,
+  })
+
+  await blog.save()
+  await blog.remove()
+
+  return blog._id.toString()
+}
+
 const blogsInDb = async () => {
   const blogs = await Blog.find({})
   return blogs.map(blog => blog.toJSON())
 }
 
 module.exports = {
-  initialBlogs, blogsInDb
+  initialBlogs, blogsInDb, nonExistingId
 }
