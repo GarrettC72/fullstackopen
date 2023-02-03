@@ -3,8 +3,8 @@ Content-Type: application/json
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImhlbGxhcyIsImlkIjoiNjNkYzhkY2I4MGFmNzQ2MGM4NGZkMWY3IiwiaWF0IjoxNjc1NDA4MzEwfQ.YKfh9DHE4JONLfjRXbswrnE8RNQWtn_aDsOP00-ht18
 
 {
-    "title": "First class tests",
-    "author": "Robert C. Martin",
-    "url": "http://blog.cleancoder.com/uncle-bob/2017/05/05/TestDefinitions.html",
+    "title": "Go To Statement Considered Harmful",
+    "author": "Edsger W. Dijkstra",
+    "url": "http://www.u.arizona.edu/~rubinson/copyright_violations/Go_To_Considered_Harmful.html",
     "likes": 0
 }
