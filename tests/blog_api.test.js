@@ -9,12 +9,19 @@ const Blog = require('../models/blog')
 const User = require('../models/user')
 const helper = require('./blog_test_helper')
 
-beforeEach(async () => {
-  await Blog.deleteMany({})
-  await Blog.insertMany(helper.initialBlogs)
-})
-
 describe('when there is initially some blogs saved', () => {
+  beforeEach(async () => {
+    await Blog.deleteMany({})
+    await User.deleteMany({})
+
+    const passwordHash = await bcrypt.hash('secret', 10)
+    const user = new User({ username: 'root', passwordHash })
+
+    const savedUser = await user.save()
+    const initialUserBlogs = helper.initialBlogs.map(blog => ({ ...blog, user: savedUser._id }))
+    await Blog.insertMany(initialUserBlogs)
+  })
+
   test('all blogs are returned as json', async () => {
     const response = await api
       .get('/api/blogs')
@@ -32,6 +39,35 @@ describe('when there is initially some blogs saved', () => {
 
   describe('addition of a new blog', () => {
     test('succeeds with valid data', async () => {
+      const usersAtStart = await helper.usersInDb()
+
+      const newUser = {
+        username: 'garrchen',
+        name: 'Garrett Chen',
+        password: 'salainen'
+      }
+
+      await api
+        .post('/api/users')
+        .send(newUser)
+        .expect(201)
+        .expect('Content-Type', /application\/json/)
+
+      const usersAtEnd = await helper.usersInDb()
+      expect(usersAtEnd).toHaveLength(usersAtStart.length + 1)
+
+      const usernames = usersAtEnd.map(u => u.username)
+      expect(usernames).toContain(newUser.username)
+
+      const loginResponse = await api
+        .post('/api/login')
+        .send({ username: 'garrchen', password: 'salainen' })
+        .expect(200)
+        .expect('Content-Type', /application\/json/)
+
+      const user = loginResponse.body
+      const userDoc = await User.findOne({ username: user.username })
+
       const newBlog = {
         title: 'Dijkstra\'s Algorithm',
         author: 'Robert C. Martin',
@@ -42,6 +78,7 @@ describe('when there is initially some blogs saved', () => {
       await api
         .post('/api/blogs')
         .send(newBlog)
+        .set('Authorization', `Bearer ${user.token}`)
         .expect(201)
         .expect('Content-Type', /application\/json/)
 
@@ -51,6 +88,7 @@ describe('when there is initially some blogs saved', () => {
 
       const titles = blogsAtEnd.map(blog => blog.title)
       const urls = blogsAtEnd.map(blog => blog.url)
+      const users = blogsAtEnd.map(blog => blog.user)
 
       expect(titles).toContain(
         'Dijkstra\'s Algorithm'
@@ -58,9 +96,41 @@ describe('when there is initially some blogs saved', () => {
       expect(urls).toContain(
         'http://blog.cleancoder.com/uncle-bob/2016/10/26/DijkstrasAlg.html'
       )
+      expect(users).toContainEqual(
+        userDoc._id
+      )
     })
 
     test('with missing likes data will default to zero likes', async () => {
+      const usersAtStart = await helper.usersInDb()
+
+      const newUser = {
+        username: 'garrchen',
+        name: 'Garrett Chen',
+        password: 'salainen'
+      }
+
+      await api
+        .post('/api/users')
+        .send(newUser)
+        .expect(201)
+        .expect('Content-Type', /application\/json/)
+
+      const usersAtEnd = await helper.usersInDb()
+      expect(usersAtEnd).toHaveLength(usersAtStart.length + 1)
+
+      const usernames = usersAtEnd.map(u => u.username)
+      expect(usernames).toContain(newUser.username)
+
+      const loginResponse = await api
+        .post('/api/login')
+        .send({ username: 'garrchen', password: 'salainen' })
+        .expect(200)
+        .expect('Content-Type', /application\/json/)
+
+      const user = loginResponse.body
+      const userDoc = await User.findOne({ username: user.username })
+
       const blogWithoutLikes = {
         title: 'Integers and Estimates',
         author: 'Robert C. Martin',
@@ -70,8 +140,27 @@ describe('when there is initially some blogs saved', () => {
       const response = await api
         .post('/api/blogs')
         .send(blogWithoutLikes)
+        .set('Authorization', `Bearer ${user.token}`)
         .expect(201)
         .expect('Content-Type', /application\/json/)
+
+      const blogsAtEnd = await helper.blogsInDb()
+
+      expect(blogsAtEnd).toHaveLength(helper.initialBlogs.length + 1)
+
+      const titles = blogsAtEnd.map(blog => blog.title)
+      const urls = blogsAtEnd.map(blog => blog.url)
+      const users = blogsAtEnd.map(blog => blog.user)
+
+      expect(titles).toContain(
+        'Integers and Estimates'
+      )
+      expect(urls).toContain(
+        'http://blog.cleancoder.com/uncle-bob/2018/06/21/IntegersAndEstimates.html'
+      )
+      expect(users).toContainEqual(
+        userDoc._id
+      )
 
       const savedBlog = response.body
 
@@ -80,32 +169,113 @@ describe('when there is initially some blogs saved', () => {
     })
 
     test('will fail with status code 400 if title is missing', async () => {
+      const usersAtStart = await helper.usersInDb()
+
+      const newUser = {
+        username: 'garrchen',
+        name: 'Garrett Chen',
+        password: 'salainen'
+      }
+
+      await api
+        .post('/api/users')
+        .send(newUser)
+        .expect(201)
+        .expect('Content-Type', /application\/json/)
+
+      const usersAtEnd = await helper.usersInDb()
+      expect(usersAtEnd).toHaveLength(usersAtStart.length + 1)
+
+      const usernames = usersAtEnd.map(u => u.username)
+      expect(usernames).toContain(newUser.username)
+
+      const loginResponse = await api
+        .post('/api/login')
+        .send({ username: 'garrchen', password: 'salainen' })
+        .expect(200)
+        .expect('Content-Type', /application\/json/)
+
+      const user = loginResponse.body
+
       const blogWithoutTitle = {
         author: 'Robert C. Martin',
         url: 'http://blog.cleancoder.com/uncle-bob/2018/06/21/IntegersAndEstimates.html',
         likes: 8
       }
 
-      await api
+      const result = await api
         .post('/api/blogs')
         .send(blogWithoutTitle)
+        .set('Authorization', `Bearer ${user.token}`)
         .expect(400)
+
+      expect(result.body.error).toContain('Path `title` is required')
 
       const blogsAtEnd = await helper.blogsInDb()
       expect(blogsAtEnd).toHaveLength(helper.initialBlogs.length)
     })
 
     test('will fail with status code 400 if url is missing', async () => {
+      const usersAtStart = await helper.usersInDb()
+
+      const newUser = {
+        username: 'garrchen',
+        name: 'Garrett Chen',
+        password: 'salainen'
+      }
+
+      await api
+        .post('/api/users')
+        .send(newUser)
+        .expect(201)
+        .expect('Content-Type', /application\/json/)
+
+      const usersAtEnd = await helper.usersInDb()
+      expect(usersAtEnd).toHaveLength(usersAtStart.length + 1)
+
+      const usernames = usersAtEnd.map(u => u.username)
+      expect(usernames).toContain(newUser.username)
+
+      const loginResponse = await api
+        .post('/api/login')
+        .send({ username: 'garrchen', password: 'salainen' })
+        .expect(200)
+        .expect('Content-Type', /application\/json/)
+
+      const user = loginResponse.body
+
       const blogWithoutUrl = {
         title: 'Integers and Estimates',
         author: 'Robert C. Martin',
         likes: 8
       }
 
-      await api
+      const result = await api
         .post('/api/blogs')
         .send(blogWithoutUrl)
+        .set('Authorization', `Bearer ${user.token}`)
         .expect(400)
+
+      expect(result.body.error).toContain('Path `url` is required')
+
+      const blogsAtEnd = await helper.blogsInDb()
+      expect(blogsAtEnd).toHaveLength(helper.initialBlogs.length)
+    })
+
+    test('will fail with status code 401 if token is not provided', async () => {
+      const newBlog = {
+        title: 'Dijkstra\'s Algorithm',
+        author: 'Robert C. Martin',
+        url: 'http://blog.cleancoder.com/uncle-bob/2016/10/26/DijkstrasAlg.html',
+        likes: 6,
+      }
+
+      const result = await api
+        .post('/api/blogs')
+        .send(newBlog)
+        .expect(401)
+
+      expect(result.body.error).toContain('token missing or invalid')
 
       const blogsAtEnd = await helper.blogsInDb()
       expect(blogsAtEnd).toHaveLength(helper.initialBlogs.length)
