@@ -169,29 +169,9 @@ describe('when there is initially some blogs saved', () => {
     })
 
     test('will fail with status code 400 if title is missing', async () => {
-      const usersAtStart = await helper.usersInDb()
-
-      const newUser = {
-        username: 'garrchen',
-        name: 'Garrett Chen',
-        password: 'salainen'
-      }
-
-      await api
-        .post('/api/users')
-        .send(newUser)
-        .expect(201)
-        .expect('Content-Type', /application\/json/)
-
-      const usersAtEnd = await helper.usersInDb()
-      expect(usersAtEnd).toHaveLength(usersAtStart.length + 1)
-
-      const usernames = usersAtEnd.map(u => u.username)
-      expect(usernames).toContain(newUser.username)
-
       const loginResponse = await api
         .post('/api/login')
-        .send({ username: 'garrchen', password: 'salainen' })
+        .send({ username: 'root', password: 'secret' })
         .expect(200)
         .expect('Content-Type', /application\/json/)
 
@@ -216,29 +196,9 @@ describe('when there is initially some blogs saved', () => {
     })
 
     test('will fail with status code 400 if url is missing', async () => {
-      const usersAtStart = await helper.usersInDb()
-
-      const newUser = {
-        username: 'garrchen',
-        name: 'Garrett Chen',
-        password: 'salainen'
-      }
-
-      await api
-        .post('/api/users')
-        .send(newUser)
-        .expect(201)
-        .expect('Content-Type', /application\/json/)
-
-      const usersAtEnd = await helper.usersInDb()
-      expect(usersAtEnd).toHaveLength(usersAtStart.length + 1)
-
-      const usernames = usersAtEnd.map(u => u.username)
-      expect(usernames).toContain(newUser.username)
-
       const loginResponse = await api
         .post('/api/login')
-        .send({ username: 'garrchen', password: 'salainen' })
+        .send({ username: 'root', password: 'secret' })
         .expect(200)
         .expect('Content-Type', /application\/json/)
 
