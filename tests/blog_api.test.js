@@ -15,7 +15,7 @@ describe('when there is initially some blogs saved', () => {
     await User.deleteMany({})
 
     const passwordHash = await bcrypt.hash('secret', 10)
-    const user = new User({ username: 'root', passwordHash })
+    const user = new User({ username: 'initialUser', passwordHash })
 
     const savedUser = await user.save()
     const initialUserBlogs = helper.initialBlogs.map(blog => ({ ...blog, user: savedUser._id }))
@@ -171,7 +171,7 @@ describe('when there is initially some blogs saved', () => {
     test('will fail with status code 400 if title is missing', async () => {
       const loginResponse = await api
         .post('/api/login')
-        .send({ username: 'root', password: 'secret' })
+        .send({ username: 'initialUser', password: 'secret' })
         .expect(200)
         .expect('Content-Type', /application\/json/)
 
@@ -198,7 +198,7 @@ describe('when there is initially some blogs saved', () => {
     test('will fail with status code 400 if url is missing', async () => {
       const loginResponse = await api
         .post('/api/login')
-        .send({ username: 'root', password: 'secret' })
+        .send({ username: 'initialUser', password: 'secret' })
         .expect(200)
         .expect('Content-Type', /application\/json/)
 
@@ -244,11 +244,20 @@ describe('when there is initially some blogs saved', () => {
 
   describe('deletion of a blog', () => {
     test('succeeds with status code 204 if id is valid', async () => {
+      const loginResponse = await api
+        .post('/api/login')
+        .send({ username: 'initialUser', password: 'secret' })
+        .expect(200)
+        .expect('Content-Type', /application\/json/)
+
+      const user = loginResponse.body
+
       const blogsAtStart = await helper.blogsInDb()
       const blogToDelete = blogsAtStart[0]
 
       await api
         .delete(`/api/blogs/${blogToDelete.id}`)
+        .set('Authorization', `Bearer ${user.token}`)
         .expect(204)
 
       const notesAtEnd = await helper.blogsInDb()
@@ -257,12 +266,23 @@ describe('when there is initially some blogs saved', () => {
       )
     })
 
-    test('with a nonexistant id to have status code 204 and have no effect', async () => {
+    test('with a nonexistant id to fail with status code 404 and have no effect', async () => {
+      const loginResponse = await api
+        .post('/api/login')
+        .send({ username: 'initialUser', password: 'secret' })
+        .expect(200)
+        .expect('Content-Type', /application\/json/)
+
+      const user = loginResponse.body
+
       const nonExistingId = await helper.nonExistingId()
 
-      await api
+      const result = await api
         .delete(`/api/blogs/${nonExistingId}`)
-        .expect(204)
+        .set('Authorization', `Bearer ${user.token}`)
+        .expect(404)
+
+      expect(result.body.error).toContain('blog not in database')
 
       const notesAtEnd = await helper.blogsInDb()
       expect(notesAtEnd).toHaveLength(
@@ -271,11 +291,83 @@ describe('when there is initially some blogs saved', () => {
     })
 
     test('fails with status code 400 if id is invalid', async () => {
+      const loginResponse = await api
+        .post('/api/login')
+        .send({ username: 'initialUser', password: 'secret' })
+        .expect(200)
+        .expect('Content-Type', /application\/json/)
+
+      const user = loginResponse.body
+
       const invalidId = '63cf6713c13ffbd98c31463'
 
-      await api
+      const result = await api
         .delete(`/api/blogs/${invalidId}`)
+        .set('Authorization', `Bearer ${user.token}`)
         .expect(400)
+
+      expect(result.body.error).toContain('malformatted id')
+
+      const notesAtEnd = await helper.blogsInDb()
+      expect(notesAtEnd).toHaveLength(
+        helper.initialBlogs.length
+      )
+    })
+
+    test('fails with status code 401 if token is not provided', async () => {
+      const blogsAtStart = await helper.blogsInDb()
+      const blogToDelete = blogsAtStart[0]
+
+      const result = await api
+        .delete(`/api/blogs/${blogToDelete.id}`)
+        .expect(401)
+
+      expect(result.body.error).toContain('token missing or invalid')
+
+      const notesAtEnd = await helper.blogsInDb()
+      expect(notesAtEnd).toHaveLength(
+        helper.initialBlogs.length
+      )
+    })
+
+    test('fails with status code 403 if user did not create blog', async () => {
+      const usersAtStart = await helper.usersInDb()
+
+      const newUser = {
+        username: 'garrchen',
+        name: 'Garrett Chen',
+        password: 'salainen'
+      }
+
+      await api
+        .post('/api/users')
+        .send(newUser)
+        .expect(201)
+        .expect('Content-Type', /application\/json/)
+
+      const usersAtEnd = await helper.usersInDb()
+      expect(usersAtEnd).toHaveLength(usersAtStart.length + 1)
+
+      const usernames = usersAtEnd.map(u => u.username)
+      expect(usernames).toContain(newUser.username)
+
+      const loginResponse = await api
+        .post('/api/login')
+        .send({ username: 'garrchen', password: 'salainen' })
+        .expect(200)
+        .expect('Content-Type', /application\/json/)
+
+      const user = loginResponse.body
+
+      const blogsAtStart = await helper.blogsInDb()
+      const blogToDelete = blogsAtStart[0]
+
+      const result = await api
+        .delete(`/api/blogs/${blogToDelete.id}`)
+        .set('Authorization', `Bearer ${user.token}`)
+        .expect(403)
+
+      expect(result.body.error).toContain('user not authorized to delete blog')
 
       const notesAtEnd = await helper.blogsInDb()
       expect(notesAtEnd).toHaveLength(
@@ -286,13 +378,23 @@ describe('when there is initially some blogs saved', () => {
 
   describe('updating a blog', () => {
     test('succeeds with status code 200 if id is valid', async () => {
+      const loginResponse = await api
+        .post('/api/login')
+        .send({ username: 'initialUser', password: 'secret' })
+        .expect(200)
+        .expect('Content-Type', /application\/json/)
+
+      const user = loginResponse.body
+      const userDoc = await User.findOne({ username: user.username })
+
       const blogsAtStart = await helper.blogsInDb()
       const blogToUpdate = blogsAtStart[0]
       const blogUpdate = {
         title: 'Space War',
         author: 'Robert C. Martin',
         url: 'http://blog.cleancoder.com/uncle-bob/2021/11/28/Spacewar.html',
-        likes: blogToUpdate.likes + 11
+        likes: blogToUpdate.likes + 11,
+        user: userDoc._id
       }
 
       const updatedBlog = await api
@@ -306,14 +408,16 @@ describe('when there is initially some blogs saved', () => {
         author: 'Robert C. Martin',
         url: 'http://blog.cleancoder.com/uncle-bob/2021/11/28/Spacewar.html',
         likes: blogToUpdate.likes + 11,
-        id: blogToUpdate.id
+        id: blogToUpdate.id,
+        user: userDoc._id.toString()
       })
       expect(updatedBlog.body).not.toEqual({
         title: blogToUpdate.title,
         author: blogToUpdate.author,
         url: blogToUpdate.url,
         likes: blogToUpdate.likes,
-        id: blogToUpdate.id
+        id: blogToUpdate.id,
+        user: userDoc._id.toString()
       })
     })
 
