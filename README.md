@@ -4,8 +4,6 @@ This repository contains my current progress for the Full Stack open 2022 course
 
 ## Course Progress
 
----
-
 **Part 0:** *Fundamentals of Web apps* ✅
 - Exercises completed: 6/6
 
