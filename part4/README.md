@@ -1,3 +1,3 @@
-# fullstackopen_part4
+# Full Stack open Part 4
 
-This repository/directory contains the exercises for part 4 of Full Stack open 2022.
+This directory contains the exercises for part 4 of Full Stack open 2022.
