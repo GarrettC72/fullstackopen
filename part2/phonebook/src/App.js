@@ -105,7 +105,22 @@ const App = () => {
       personService
         .deleteObject(person.id)
         .then(response => {
+          setErrorMessage(
+            `Removed ${person.name}`
+          )
+          setTimeout(() => {
+            setErrorMessage(null)
+          }, 5000)
+          setIsError(false)
           setPersons(persons.filter(p => p.id !== person.id))
+        })
+        .catch(error => {
+          console.log(error.response.data.error)
+          setErrorMessage(error.response.data.error)
+          setTimeout(() => {
+            setErrorMessage(null)
+          }, 5000)
+          setIsError(true)
         })
     }
   }
