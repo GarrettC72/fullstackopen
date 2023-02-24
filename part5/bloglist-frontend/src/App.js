@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import Blog from './components/Blog'
+import Notification from './components/Notification'
 import blogService from './services/blogs'
 import loginService from './services/login'
 
@@ -10,6 +11,7 @@ const App = () => {
   const [newUrl, setNewUrl] = useState('')
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
+  const [info, setInfo] = useState({ message: null })
   const [user, setUser] = useState(null)
 
   useEffect(() => {
@@ -26,6 +28,16 @@ const App = () => {
     }
   }, [])
 
+  const notifyWith = (message, type='info') => {
+    setInfo({
+      message, type
+    })
+
+    setTimeout(() => {
+      setInfo({ message: null })
+    }, 3000)
+  }
+
   const handleLogin = async (event) => {
     event.preventDefault()
     
@@ -38,11 +50,12 @@ const App = () => {
         'loggedBlogappUser', JSON.stringify(user)
       )
       blogService.setToken(user.token)
+      notifyWith(`Logged in as ${user.name}`)
       setUser(user)
       setUsername('')
       setPassword('')
     } catch (exception) {
-      
+      notifyWith('wrong username or password', 'error')
     }
   }
 
@@ -53,44 +66,47 @@ const App = () => {
 
   const addBlog = async (event) => {
     event.preventDefault()
-    const blogObject = {
-      title: newTitle,
-      author: newAuthor,
-      url: newUrl
-    }
 
-    const returnedBlog = await blogService.create(blogObject)
-    setBlogs(blogs.concat(returnedBlog))
-    setNewTitle('')
-    setNewAuthor('')
-    setNewUrl('')
+    try {
+      const blogObject = {
+        title: newTitle,
+        author: newAuthor,
+        url: newUrl
+      }
+  
+      const returnedBlog = await blogService.create(blogObject)
+      notifyWith(`a new blog ${returnedBlog.title} by ${returnedBlog.author} added`)
+      setBlogs(blogs.concat(returnedBlog))
+      setNewTitle('')
+      setNewAuthor('')
+      setNewUrl('')
+    } catch(exception) {
+      notifyWith('failed to add blog - title or url is missing', 'error')
+    }
   }
 
   const loginForm = () => (
-    <div>
-      <h2>log in to application</h2>
-      <form onSubmit={handleLogin}>
-        <div>
-          username
-            <input
-              type="text"
-              value={username}
-              name="Username"
-              onChange={({ target }) => setUsername(target.value)}
-          />
-        </div>
-        <div>
-          password
-            <input
-              type="password"
-              value={password}
-              name="Password"
-              onChange={({ target }) => setPassword(target.value)}
-          />
-        </div>
-        <button type="submit">login</button>
-      </form>
-    </div>
+    <form onSubmit={handleLogin}>
+      <div>
+        username
+          <input
+            type="text"
+            value={username}
+            name="Username"
+            onChange={({ target }) => setUsername(target.value)}
+        />
+      </div>
+      <div>
+        password
+          <input
+            type="password"
+            value={password}
+            name="Password"
+            onChange={({ target }) => setPassword(target.value)}
+        />
+      </div>
+      <button type="submit">login</button>
+    </form>
   )
 
   const blogForm = () => (
@@ -126,20 +142,26 @@ const App = () => {
     </form>
   )
 
+  if (user === null) {
+    return (
+      <div>
+        <h2>log in to application</h2>
+        <Notification info={info} />
+        {loginForm()}
+      </div>
+    )
+  }
+
   return (
     <div>
-      {user === null ?
-        loginForm() :
-        <div>
-          <h2>blogs</h2>
-          <p>{user.name} logged in<button onClick={handleLogout}>logout</button></p>
-          <h2>create new</h2>
-          {blogForm()}
-          {blogs.map(blog =>
-            <Blog key={blog.id} blog={blog} />
-          )}
-        </div>
-      }
+      <h2>blogs</h2>
+      <Notification info={info} />
+      <p>{user.name} logged in<button onClick={handleLogout}>logout</button></p>
+      <h2>create new</h2>
+      {blogForm()}
+      {blogs.map(blog =>
+        <Blog key={blog.id} blog={blog} />
+      )}
     </div>
   )
 }
