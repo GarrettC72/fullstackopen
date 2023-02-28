@@ -1,6 +1,7 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import Blog from './components/Blog'
 import Notification from './components/Notification'
+import Toggleable from './components/Toggleable'
 import blogService from './services/blogs'
 import loginService from './services/login'
 
@@ -25,8 +26,11 @@ const App = () => {
     if (loggedUserJSON) {
       const user = JSON.parse(loggedUserJSON)
       setUser(user)
+      blogService.setToken(user.token)
     }
   }, [])
+
+  const blogFormRef = useRef()
 
   const notifyWith = (message, type='info') => {
     setInfo({
@@ -67,22 +71,25 @@ const App = () => {
   const addBlog = async (event) => {
     event.preventDefault()
 
-    try {
-      const blogObject = {
-        title: newTitle,
-        author: newAuthor,
-        url: newUrl
-      }
-  
-      const returnedBlog = await blogService.create(blogObject)
-      notifyWith(`a new blog ${returnedBlog.title} by ${returnedBlog.author} added`)
-      setBlogs(blogs.concat(returnedBlog))
-      setNewTitle('')
-      setNewAuthor('')
-      setNewUrl('')
-    } catch(exception) {
-      notifyWith('failed to add blog - title or url is missing', 'error')
+    const blogObject = {
+      title: newTitle,
+      author: newAuthor,
+      url: newUrl
     }
+
+    blogService
+      .create(blogObject)
+        .then(returnedBlog => {
+          notifyWith(`a new blog ${returnedBlog.title} by ${returnedBlog.author} added`)
+          setBlogs(blogs.concat(returnedBlog))
+          setNewTitle('')
+          setNewAuthor('')
+          setNewUrl('')
+          blogFormRef.current.toggleVisibility()
+        })
+        .catch(error => {
+          notifyWith('failed to add blog - title or url is missing', 'error')
+        })
   }
 
   const loginForm = () => (
@@ -110,36 +117,39 @@ const App = () => {
   )
 
   const blogForm = () => (
-    <form onSubmit={addBlog}>
-      <div>
-        title:
-          <input
-            type="text"
-            value={newTitle}
-            name="Title"
-            onChange={({ target }) => setNewTitle(target.value)}
-        />
-      </div>
-      <div>
-        author:
-          <input
-            type="text"
-            value={newAuthor}
-            name="Author"
-            onChange={({ target }) => setNewAuthor(target.value)}
-        />
-      </div>
-      <div>
-        url:
-          <input
-            type="text"
-            value={newUrl}
-            name="Url"
-            onChange={({ target }) => setNewUrl(target.value)}
-        />
-      </div>
-      <button type="submit">create</button>
-    </form>
+    <div>
+      <h2>create new</h2>
+      <form onSubmit={addBlog}>
+        <div>
+          title:
+            <input
+              type="text"
+              value={newTitle}
+              name="Title"
+              onChange={({ target }) => setNewTitle(target.value)}
+          />
+        </div>
+        <div>
+          author:
+            <input
+              type="text"
+              value={newAuthor}
+              name="Author"
+              onChange={({ target }) => setNewAuthor(target.value)}
+          />
+        </div>
+        <div>
+          url:
+            <input
+              type="text"
+              value={newUrl}
+              name="Url"
+              onChange={({ target }) => setNewUrl(target.value)}
+          />
+        </div>
+        <button type="submit">create</button>
+      </form>
+    </div>
   )
 
   if (user === null) {
@@ -157,8 +167,9 @@ const App = () => {
       <h2>blogs</h2>
       <Notification info={info} />
       <p>{user.name} logged in<button onClick={handleLogout}>logout</button></p>
-      <h2>create new</h2>
-      {blogForm()}
+      <Toggleable buttonLabel="new note" ref={blogFormRef}>
+        {blogForm()}
+      </Toggleable>
       {blogs.map(blog =>
         <Blog key={blog.id} blog={blog} />
       )}
