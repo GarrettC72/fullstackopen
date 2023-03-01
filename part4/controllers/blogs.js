@@ -1,3 +1,4 @@
+const mongoose = require('mongoose')
 const blogsRouter = require('express').Router()
 const Blog = require('../models/blog')
 const { userExtractor } = require('../utils/middleware')
@@ -55,9 +56,14 @@ blogsRouter.delete('/:id', userExtractor, async (request, response) => {
 blogsRouter.put('/:id', async (request, response) => {
   const { title, author, url, likes, user } = request.body
 
+  const blog = {
+    title, author, url, likes,
+    user: mongoose.Types.ObjectId(user)
+  }
+
   const updatedBlog = await Blog.findByIdAndUpdate(
     request.params.id,
-    { title, author, url, likes, user },
+    blog,
     { new: true, runValidators: true, context: 'query' }
   )
 
