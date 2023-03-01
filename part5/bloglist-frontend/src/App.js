@@ -66,7 +66,7 @@ const App = () => {
       .create(blogObject)
       .then(returnedBlog => {
         notifyWith(`a new blog ${returnedBlog.title} by ${returnedBlog.author} added`)
-        setBlogs(blogs.concat(returnedBlog))
+        setBlogs(blogs.concat({ ...returnedBlog, user }))
         blogFormRef.current.toggleVisibility()
       })
       .catch(error => {
@@ -89,7 +89,7 @@ const App = () => {
       <Notification info={info} />
 
       <p>{user.name} logged in<button onClick={handleLogout}>logout</button></p>
-      <Toggleable buttonLabel="new note" ref={blogFormRef}>
+      <Toggleable buttonLabel="create new blog" ref={blogFormRef}>
         <BlogForm createBlog={addBlog} />
       </Toggleable>
       {blogs.map(blog =>
