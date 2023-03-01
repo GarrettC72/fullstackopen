@@ -1,17 +1,14 @@
 import { useState, useEffect, useRef } from 'react'
 import Blog from './components/Blog'
 import Notification from './components/Notification'
+import LoginForm from './components/LoginForm'
+import BlogForm from './components/BlogForm'
 import Toggleable from './components/Toggleable'
 import blogService from './services/blogs'
 import loginService from './services/login'
 
 const App = () => {
   const [blogs, setBlogs] = useState([])
-  const [newTitle, setNewTitle] = useState('')
-  const [newAuthor, setNewAuthor] = useState('')
-  const [newUrl, setNewUrl] = useState('')
-  const [username, setUsername] = useState('')
-  const [password, setPassword] = useState('')
   const [info, setInfo] = useState({ message: null })
   const [user, setUser] = useState(null)
 
@@ -42,9 +39,7 @@ const App = () => {
     }, 3000)
   }
 
-  const handleLogin = async (event) => {
-    event.preventDefault()
-    
+  const handleLogin = async (username, password) => {
     try {
       const user = await loginService.login({
         username, password,
@@ -56,8 +51,6 @@ const App = () => {
       blogService.setToken(user.token)
       notifyWith(`Logged in as ${user.name}`)
       setUser(user)
-      setUsername('')
-      setPassword('')
     } catch (exception) {
       notifyWith('wrong username or password', 'error')
     }
@@ -68,97 +61,25 @@ const App = () => {
     setUser(null)
   }
 
-  const addBlog = async (event) => {
-    event.preventDefault()
-
-    const blogObject = {
-      title: newTitle,
-      author: newAuthor,
-      url: newUrl
-    }
-
+  const addBlog = (blogObject) => {
     blogService
       .create(blogObject)
-        .then(returnedBlog => {
-          notifyWith(`a new blog ${returnedBlog.title} by ${returnedBlog.author} added`)
-          setBlogs(blogs.concat(returnedBlog))
-          setNewTitle('')
-          setNewAuthor('')
-          setNewUrl('')
-          blogFormRef.current.toggleVisibility()
-        })
-        .catch(error => {
-          notifyWith('failed to add blog - title or url is missing', 'error')
-        })
+      .then(returnedBlog => {
+        notifyWith(`a new blog ${returnedBlog.title} by ${returnedBlog.author} added`)
+        setBlogs(blogs.concat(returnedBlog))
+        blogFormRef.current.toggleVisibility()
+      })
+      .catch(error => {
+        notifyWith('failed to add blog - title or url is missing', 'error')
+      })
   }
-
-  const loginForm = () => (
-    <form onSubmit={handleLogin}>
-      <div>
-        username
-          <input
-            type="text"
-            value={username}
-            name="Username"
-            onChange={({ target }) => setUsername(target.value)}
-        />
-      </div>
-      <div>
-        password
-          <input
-            type="password"
-            value={password}
-            name="Password"
-            onChange={({ target }) => setPassword(target.value)}
-        />
-      </div>
-      <button type="submit">login</button>
-    </form>
-  )
-
-  const blogForm = () => (
-    <div>
-      <h2>create new</h2>
-      <form onSubmit={addBlog}>
-        <div>
-          title:
-            <input
-              type="text"
-              value={newTitle}
-              name="Title"
-              onChange={({ target }) => setNewTitle(target.value)}
-          />
-        </div>
-        <div>
-          author:
-            <input
-              type="text"
-              value={newAuthor}
-              name="Author"
-              onChange={({ target }) => setNewAuthor(target.value)}
-          />
-        </div>
-        <div>
-          url:
-            <input
-              type="text"
-              value={newUrl}
-              name="Url"
-              onChange={({ target }) => setNewUrl(target.value)}
-          />
-        </div>
-        <button type="submit">create</button>
-      </form>
-    </div>
-  )
 
   if (user === null) {
     return (
-      <div>
-        <h2>log in to application</h2>
-        <Notification info={info} />
-        {loginForm()}
-      </div>
+      <LoginForm 
+        createLogin={handleLogin}
+        info={info}
+      />
     )
   }
 
@@ -166,9 +87,10 @@ const App = () => {
     <div>
       <h2>blogs</h2>
       <Notification info={info} />
+
       <p>{user.name} logged in<button onClick={handleLogout}>logout</button></p>
       <Toggleable buttonLabel="new note" ref={blogFormRef}>
-        {blogForm()}
+        <BlogForm createBlog={addBlog} />
       </Toggleable>
       {blogs.map(blog =>
         <Blog key={blog.id} blog={blog} />
