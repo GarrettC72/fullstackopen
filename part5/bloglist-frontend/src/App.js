@@ -61,17 +61,27 @@ const App = () => {
     setUser(null)
   }
 
-  const addBlog = (blogObject) => {
-    blogService
-      .create(blogObject)
-      .then(returnedBlog => {
-        notifyWith(`a new blog ${returnedBlog.title} by ${returnedBlog.author} added`)
-        setBlogs(blogs.concat({ ...returnedBlog, user }))
-        blogFormRef.current.toggleVisibility()
-      })
-      .catch(error => {
-        notifyWith('failed to add blog - title or url is missing', 'error')
-      })
+  const addBlog = async (blogObject) => {
+    try {
+      const returnedBlog = await blogService.create(blogObject)
+
+      notifyWith(`a new blog ${blogObject.title} by ${blogObject.author} added`)
+      setBlogs(blogs.concat({ ...returnedBlog, user: { ...user, id: returnedBlog.user } }))
+      blogFormRef.current.toggleVisibility()
+    } catch(exception) {
+      notifyWith('failed to add blog - title or url is missing', 'error')
+    }
+  }
+
+  const updateBlog = async (blogObject) => {
+    try {
+      const updatedBlog = await blogService.update(blogObject.id, blogObject)
+
+      notifyWith(`blog ${blogObject.title} by ${blogObject.author} was liked`)
+      setBlogs(blogs.map(blog => blog.id !== blogObject.id ? blog : { ...blog, likes: updatedBlog.likes }))
+    } catch (exception) {
+      notifyWith(`blog ${blogObject.title} by ${blogObject.author} has already been removed`, 'error')
+    }
   }
 
   if (user === null) {
@@ -93,7 +103,7 @@ const App = () => {
         <BlogForm createBlog={addBlog} />
       </Toggleable>
       {blogs.map(blog =>
-        <Blog key={blog.id} blog={blog} />
+        <Blog key={blog.id} updateBlog={updateBlog} blog={blog} />
       )}
     </div>
   )

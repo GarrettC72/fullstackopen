@@ -1,6 +1,6 @@
 import { useState } from 'react'
 
-const Blog = ({ blog }) => {
+const Blog = ({ updateBlog, blog }) => {
   const [fullView, setFullView] = useState(false)
   
   const blogStyle = {
@@ -11,11 +11,19 @@ const Blog = ({ blog }) => {
     marginBottom: 5
   }
 
+  const likeBlog = () => {
+    updateBlog({
+      ...blog,
+      likes: blog.likes + 1,
+      user: blog.user.id
+    })
+  }
+
   const extraBlogDetails = () => {
     return (
       <div>
         <a href={blog.url}>{blog.url}</a>
-        <div>likes {blog.likes}<button>like</button></div>
+        <div>likes {blog.likes}<button onClick={likeBlog}>like</button></div>
         <div>{blog.user.name}</div>
       </div>
     )
