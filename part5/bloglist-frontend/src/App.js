@@ -68,7 +68,7 @@ const App = () => {
       notifyWith(`a new blog ${blogObject.title} by ${blogObject.author} added`)
       setBlogs(blogs.concat({ ...returnedBlog, user: { ...user, id: returnedBlog.user } }))
       blogFormRef.current.toggleVisibility()
-    } catch(exception) {
+    } catch (exception) {
       notifyWith('failed to add blog - title or url is missing', 'error')
     }
   }
@@ -81,6 +81,17 @@ const App = () => {
       setBlogs(blogs.map(blog => blog.id !== blogObject.id ? blog : { ...blog, likes: updatedBlog.likes }))
     } catch (exception) {
       notifyWith(`blog ${blogObject.title} by ${blogObject.author} has already been removed`, 'error')
+    }
+  }
+
+  const deleteBlog = async (blog) => {
+    try {
+      await blogService.deleteObject(blog.id)
+
+      notifyWith(`Removed ${blog.title} by ${blog.author}`)
+      setBlogs(blogs.filter(b => b.id !== blog.id))
+    } catch (exception) {
+      notifyWith(exception.response.data.error, 'error')
     }
   }
 
@@ -105,7 +116,7 @@ const App = () => {
         <BlogForm createBlog={addBlog} />
       </Toggleable>
       {sortedBlogs.map(blog =>
-        <Blog key={blog.id} updateBlog={updateBlog} blog={blog} />
+        <Blog key={blog.id} updateBlog={updateBlog} deleteBlog={deleteBlog} blog={blog} user={user} />
       )}
     </div>
   )
