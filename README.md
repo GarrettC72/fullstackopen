@@ -20,4 +20,4 @@ This repository contains my current progress for the Full Stack open 2022 course
 - Exercises completed: 23/23
 
 **Part 5:** *Testing React apps*
-- Exercises completed: 9/23
+- Exercises completed: 10/23
