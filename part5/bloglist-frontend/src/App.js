@@ -15,7 +15,7 @@ const App = () => {
   useEffect(() => {
     blogService.getAll().then(blogs =>
       setBlogs( blogs )
-    )  
+    )
   }, [])
 
   useEffect(() => {
@@ -97,7 +97,7 @@ const App = () => {
 
   if (user === null) {
     return (
-      <LoginForm 
+      <LoginForm
         createLogin={handleLogin}
         info={info}
       />

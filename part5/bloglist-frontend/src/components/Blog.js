@@ -1,8 +1,9 @@
 import { useState } from 'react'
+import PropTypes from 'prop-types'
 
 const Blog = ({ updateBlog, deleteBlog, blog, user }) => {
   const [fullView, setFullView] = useState(false)
-  
+
   const blogStyle = {
     paddingTop: 10,
     paddingLeft: 2,
@@ -45,8 +46,15 @@ const Blog = ({ updateBlog, deleteBlog, blog, user }) => {
         </button>
       </div>
       {fullView && extraBlogDetails()}
-    </div> 
+    </div>
   )
+}
+
+Blog.propTypes = {
+  updateBlog: PropTypes.func.isRequired,
+  deleteBlog: PropTypes.func.isRequired,
+  blog: PropTypes.object.isRequired,
+  user: PropTypes.object.isRequired
 }
 
 export default Blog
