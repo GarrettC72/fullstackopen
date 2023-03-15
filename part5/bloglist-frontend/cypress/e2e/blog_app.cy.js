@@ -39,4 +39,21 @@ describe('Blog app', function() {
       cy.get('html').should('not.contain', 'John Smith logged in')
     })
   })
+
+  describe('When logged in', function() {
+    beforeEach(function() {
+      cy.get('#username').type('jsmith')
+      cy.get('#password').type('mithsohn')
+      cy.get('#login-button').click()
+    })
+
+    it('A blog can be created', function() {
+      cy.contains('create new blog').click()
+      cy.get('#title').type('First class tests')
+      cy.get('#author').type('Robert C. Martin')
+      cy.get('#url').type('http://blog.cleancoder.com/uncle-bob/2017/05/05/TestDefinitions.html')
+      cy.get('#create-blog-button').click()
+      cy.contains('First class tests Robert C. Martin')
+    })
+  })
 })
