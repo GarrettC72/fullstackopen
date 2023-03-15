@@ -1,13 +1,13 @@
 describe('Blog app', function() {
   beforeEach(function() {
-    cy.request('POST', 'http://localhost:3003/api/testing/reset')
+    cy.request('POST', `${Cypress.env('BACKEND')}/testing/reset`)
     const user = {
       name: 'John Smith',
       username: 'jsmith',
       password: 'mithsohn'
     }
-    cy.request('POST', 'http://localhost:3003/api/users', user)
-    cy.visit('http://localhost:3000')
+    cy.request('POST', `${Cypress.env('BACKEND')}/users`, user)
+    cy.visit('')
   })
 
   it('Login form is shown', function() {
@@ -42,9 +42,7 @@ describe('Blog app', function() {
 
   describe('When logged in', function() {
     beforeEach(function() {
-      cy.get('#username').type('jsmith')
-      cy.get('#password').type('mithsohn')
-      cy.get('#login-button').click()
+      cy.login({ username: 'jsmith', password: 'mithsohn' })
     })
 
     it('A blog can be created', function() {
@@ -54,6 +52,24 @@ describe('Blog app', function() {
       cy.get('#url').type('http://blog.cleancoder.com/uncle-bob/2017/05/05/TestDefinitions.html')
       cy.get('#create-blog-button').click()
       cy.contains('First class tests Robert C. Martin')
+    })
+
+    describe('And a blog exists', function() {
+      beforeEach(function() {
+        cy.createBlog({
+          title: 'First class tests',
+          author: 'Robert C. Martin',
+          url: 'http://blog.cleancoder.com/uncle-bob/2017/05/05/TestDefinitions.html',
+          likes: 0
+        })
+      })
+
+      it('A blog can be liked', function() {
+        cy.contains('view').click()
+        cy.contains('First class tests Robert C. Martin').parent().as('theBlog')
+        cy.get('@theBlog').find('.like-button').click()
+        cy.get('@theBlog').should('contain', 'likes 1')
+      })
     })
   })
 })
