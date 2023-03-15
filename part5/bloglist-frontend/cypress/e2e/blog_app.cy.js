@@ -66,9 +66,15 @@ describe('Blog app', function() {
 
       it('A blog can be liked', function() {
         cy.contains('view').click()
-        cy.contains('First class tests Robert C. Martin').parent().as('theBlog')
+        cy.contains('First class tests').parent().as('theBlog')
         cy.get('@theBlog').find('.like-button').click()
         cy.get('@theBlog').should('contain', 'likes 1')
+      })
+
+      it('The user who created the blog can delete it', function() {
+        cy.contains('view').click()
+        cy.contains('First class tests').parent().find('.delete-button').click()
+        cy.get('html').should('not.contain', 'First class tests')
       })
     })
   })
