@@ -19,5 +19,5 @@ This repository contains my current progress for the Full Stack open 2022 course
 **Part 4:** *Testing Express servers, user administration* ✅
 - Exercises completed: 23/23
 
-**Part 5:** *Testing React apps*
-- Exercises completed: 22/23
+**Part 5:** *Testing React apps* ✅
+- Exercises completed: 23/23

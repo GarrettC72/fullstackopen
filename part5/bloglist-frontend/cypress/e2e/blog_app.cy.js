@@ -60,7 +60,7 @@ describe('Blog app', function() {
       cy.contains('First class tests Robert C. Martin')
     })
 
-    describe('And a blog exists', function() {
+    describe('And several blog exists', function() {
       beforeEach(function() {
         cy.createBlog({
           title: 'First class tests',
@@ -68,25 +68,55 @@ describe('Blog app', function() {
           url: 'http://blog.cleancoder.com/uncle-bob/2017/05/05/TestDefinitions.html',
           likes: 0
         })
+        cy.createBlog({
+          title: 'Canonical string reduction',
+          author: 'Edsger W. Dijkstra',
+          url: 'http://www.cs.utexas.edu/~EWD/transcriptions/EWD08xx/EWD808.html',
+          likes: 5
+        })
+        cy.createBlog({
+          title: 'Go To Statement Considered Harmful',
+          author: 'Edsger W. Dijkstra',
+          url: 'http://www.u.arizona.edu/~rubinson/copyright_violations/Go_To_Considered_Harmful.html',
+          likes: 2
+        })
       })
 
       it('A blog can be liked', function() {
-        cy.contains('view').click()
-        cy.contains('First class tests').parent().as('theBlog')
+        cy.contains('First class tests Robert C. Martin').parent().as('theBlog')
+        cy.get('@theBlog').contains('view').click()
         cy.get('@theBlog').find('.like-button').click()
         cy.get('@theBlog').should('contain', 'likes 1')
       })
 
       it('The user who created the blog can delete it', function() {
-        cy.contains('view').click()
-        cy.contains('First class tests').parent().find('.delete-button').click()
+        cy.on('window:confirm', (str) => {
+          expect(str).to.eq('Remove blog First class tests by Robert C. Martin')
+          return true
+        })
+        cy.contains('First class tests Robert C. Martin').parent().as('theBlog')
+        cy.get('@theBlog').contains('view').click()
+        cy.get('@theBlog').find('.delete-button').click()
         cy.get('html').should('not.contain', 'First class tests')
       })
 
       it('Another user can not see the delete button', function() {
         cy.login({ username: 'bjones', password: 'jonoob' })
-        cy.contains('view').click()
-        cy.contains('First class tests').parent().should('not.contain', 'remove')
+        cy.contains('First class tests Robert C. Martin').parent().as('theBlog')
+        cy.get('@theBlog').contains('view').click()
+        cy.get('@theBlog').should('not.contain', 'remove')
+      })
+
+      it('Blogs are ordered by likes', function() {
+        cy.contains('First class tests Robert C. Martin').parent().as('theBlog')
+        cy.get('@theBlog').contains('view').click()
+        cy.get('@theBlog').find('.like-button').as('blogLike')
+        cy.get('@blogLike').click()
+        cy.get('@blogLike').click()
+        cy.get('@blogLike').click()
+        cy.get('.blog').eq(0).should('contain', 'Canonical string reduction')
+        cy.get('.blog').eq(1).should('contain', 'First class tests')
+        cy.get('.blog').eq(2).should('contain', 'Go To Statement Considered Harmful')
       })
     })
   })

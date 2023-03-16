@@ -21,7 +21,7 @@ const Blog = ({ updateBlog, deleteBlog, blog, user }) => {
   }
 
   const handleDelete = () => {
-    if(window.confirm(`Remove ${blog.title} by ${blog.author}`)) {
+    if(window.confirm(`Remove blog ${blog.title} by ${blog.author}`)) {
       deleteBlog(blog)
     }
   }
