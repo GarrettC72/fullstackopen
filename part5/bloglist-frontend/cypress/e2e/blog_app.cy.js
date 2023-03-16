@@ -7,6 +7,12 @@ describe('Blog app', function() {
       password: 'mithsohn'
     }
     cy.request('POST', `${Cypress.env('BACKEND')}/users`, user)
+    const secondUser = {
+      name: 'Bob Jones',
+      username: 'bjones',
+      password: 'jonoob'
+    }
+    cy.request('POST', `${Cypress.env('BACKEND')}/users`, secondUser)
     cy.visit('')
   })
 
@@ -75,6 +81,12 @@ describe('Blog app', function() {
         cy.contains('view').click()
         cy.contains('First class tests').parent().find('.delete-button').click()
         cy.get('html').should('not.contain', 'First class tests')
+      })
+
+      it('Another user can not see the delete button', function() {
+        cy.login({ username: 'bjones', password: 'jonoob' })
+        cy.contains('view').click()
+        cy.contains('First class tests').parent().should('not.contain', 'remove')
       })
     })
   })
