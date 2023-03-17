@@ -21,3 +21,6 @@ This repository contains my current progress for the Full Stack open 2022 course
 
 **Part 5:** *Testing React apps* ✅
 - Exercises completed: 23/23
+
+**Part 6:** *Advanced state management*
+- Exercises completed: 1/24
