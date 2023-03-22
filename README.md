@@ -23,4 +23,4 @@ This repository contains my current progress for the Full Stack open 2022 course
 - Exercises completed: 23/23
 
 **Part 6:** *Advanced state management*
-- Exercises completed: 16/24
+- Exercises completed: 17/24
