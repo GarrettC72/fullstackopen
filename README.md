@@ -26,4 +26,4 @@ This repository contains my current progress for the Full Stack open 2022 course
 - Exercises completed: 24/24
 
 **Part 7:** *React router, custom hooks, styling app with CSS and webpack*
-- Exercises completed: 1/21
+- Exercises completed: 2/21
