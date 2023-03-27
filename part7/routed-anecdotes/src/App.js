@@ -4,6 +4,7 @@ import {
   Route,
   Link,
   useMatch,
+  useNavigate,
 } from 'react-router-dom'
 
 const Menu = () => {
@@ -16,6 +17,14 @@ const Menu = () => {
       <Link style={padding} to="/create">create new</Link>
       <Link style={padding} to="/about">about</Link>
     </div>
+  )
+}
+
+const Notification = ({ notification }) => {
+  if (!notification) return
+
+  return (
+    <div>{notification}</div>
   )
 }
 
@@ -63,6 +72,8 @@ const Footer = () => (
 )
 
 const CreateNew = (props) => {
+  const navigate = useNavigate()
+
   const [content, setContent] = useState('')
   const [author, setAuthor] = useState('')
   const [info, setInfo] = useState('')
@@ -76,6 +87,7 @@ const CreateNew = (props) => {
       info,
       votes: 0
     })
+    navigate('/')
   }
 
   return (
@@ -124,6 +136,12 @@ const App = () => {
   const addNew = (anecdote) => {
     anecdote.id = Math.round(Math.random() * 10000)
     setAnecdotes(anecdotes.concat(anecdote))
+    notifyWith(`a new anecdote ${anecdote.content} created!`)
+  }
+
+  const notifyWith = (message) => {
+    setNotification(message)
+    setTimeout(() => setNotification(''), 5000)
   }
 
   const anecdoteById = (id) =>
@@ -143,13 +161,14 @@ const App = () => {
   const match = useMatch('/anecdotes/:id')
 
   const anecdote = match
-    ? anecdotes.find(anecdote => anecdote.id === Number(match.params.id))
+    ? anecdoteById(Number(match.params.id))
     : null
 
   return (
     <div>
       <h1>Software anecdotes</h1>
       <Menu />
+      <Notification notification={notification} />
       <Routes>
         <Route path="/anecdotes/:id" element={<Anecdote anecdote={anecdote} />} />
         <Route path="/create" element={<CreateNew addNew={addNew} />} />
