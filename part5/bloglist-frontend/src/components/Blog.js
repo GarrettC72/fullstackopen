@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import PropTypes from 'prop-types'
 
-const Blog = ({ updateBlog, deleteBlog, blog, user }) => {
+const Blog = ({ updateBlog, deleteBlog, blog, canRemove }) => {
   const [fullView, setFullView] = useState(false)
 
   const blogStyle = {
@@ -16,7 +16,6 @@ const Blog = ({ updateBlog, deleteBlog, blog, user }) => {
     updateBlog({
       ...blog,
       likes: blog.likes + 1,
-      user: blog.user.id
     })
   }
 
@@ -31,8 +30,8 @@ const Blog = ({ updateBlog, deleteBlog, blog, user }) => {
       <div>
         <a href={blog.url}>{blog.url}</a>
         <div>likes {blog.likes}<button className="like-button" onClick={likeBlog}>like</button></div>
-        <div>{blog.user.name}</div>
-        {blog.user.username === user.username && <button className="delete-button" onClick={handleDelete}>remove</button>}
+        <div>{blog.user && blog.user.name}</div>
+        {canRemove && <button className="delete-button" onClick={handleDelete}>remove</button>}
       </div>
     )
   }
@@ -53,8 +52,13 @@ const Blog = ({ updateBlog, deleteBlog, blog, user }) => {
 Blog.propTypes = {
   updateBlog: PropTypes.func.isRequired,
   deleteBlog: PropTypes.func.isRequired,
-  blog: PropTypes.object.isRequired,
-  user: PropTypes.object.isRequired
+  blog: PropTypes.shape({
+    title: PropTypes.string,
+    author: PropTypes.string,
+    url: PropTypes.string,
+    likes: PropTypes.number
+  }),
+  canRemove: PropTypes.bool.isRequired
 }
 
 export default Blog

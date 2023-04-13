@@ -21,7 +21,7 @@ const App = () => {
   useEffect(() => {
     const loggedUserJSON = window.localStorage.getItem('loggedBlogappUser')
     if (loggedUserJSON) {
-      const user = JSON.parse(loggedUserJSON)
+      const user = JSON.parse(loggedUserJSON) || null
       setUser(user)
       blogService.setToken(user.token)
     }
@@ -49,8 +49,8 @@ const App = () => {
         'loggedBlogappUser', JSON.stringify(user)
       )
       blogService.setToken(user.token)
-      notifyWith(`Logged in as ${user.name}`)
       setUser(user)
+      notifyWith(`Logged in as ${user.name}`)
     } catch (exception) {
       notifyWith('wrong username or password', 'error')
     }
@@ -59,6 +59,7 @@ const App = () => {
   const handleLogout = () => {
     window.localStorage.removeItem('loggedBlogappUser')
     setUser(null)
+    notifyWith('logged out')
   }
 
   const addBlog = async (blogObject) => {
@@ -66,7 +67,7 @@ const App = () => {
       const returnedBlog = await blogService.create(blogObject)
 
       notifyWith(`a new blog ${blogObject.title} by ${blogObject.author} added`)
-      setBlogs(blogs.concat({ ...returnedBlog, user: { ...user, id: returnedBlog.user } }))
+      setBlogs(blogs.concat(returnedBlog))
       blogFormRef.current.toggleVisibility()
     } catch (exception) {
       notifyWith('failed to add blog - title or url is missing', 'error')
@@ -75,10 +76,10 @@ const App = () => {
 
   const updateBlog = async (blogObject) => {
     try {
-      const updatedBlog = await blogService.update(blogObject.id, blogObject)
+      const updatedBlog = await blogService.update(blogObject)
 
       notifyWith(`blog ${blogObject.title} by ${blogObject.author} was liked`)
-      setBlogs(blogs.map(blog => blog.id !== blogObject.id ? blog : { ...blog, likes: updatedBlog.likes }))
+      setBlogs(blogs.map(blog => blog.id !== blogObject.id ? blog : updatedBlog))
     } catch (exception) {
       notifyWith(`blog ${blogObject.title} by ${blogObject.author} has already been removed`, 'error')
     }
@@ -116,7 +117,13 @@ const App = () => {
         <BlogForm createBlog={addBlog} />
       </Toggleable>
       {sortedBlogs.map(blog =>
-        <Blog key={blog.id} updateBlog={updateBlog} deleteBlog={deleteBlog} blog={blog} user={user} />
+        <Blog
+          key={blog.id}
+          updateBlog={updateBlog}
+          deleteBlog={deleteBlog}
+          blog={blog}
+          canRemove={user && blog.user.username === user.username}
+        />
       )}
     </div>
   )
