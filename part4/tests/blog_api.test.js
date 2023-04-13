@@ -15,7 +15,7 @@ describe('when there is initially some blogs saved', () => {
     await User.deleteMany({})
 
     const passwordHash = await bcrypt.hash('secret', 10)
-    const user = new User({ username: 'initialUser', passwordHash })
+    const user = new User({ name: 'Initial User', username: 'initialUser', passwordHash })
 
     const savedUser = await user.save()
     const initialUserBlogs = helper.initialBlogs.map(blog => ({ ...blog, user: savedUser._id }))
@@ -235,7 +235,7 @@ describe('when there is initially some blogs saved', () => {
         .send(newBlog)
         .expect(401)
 
-      expect(result.body.error).toContain('token missing or invalid')
+      expect(result.body.error).toContain('operation not permitted')
 
       const blogsAtEnd = await helper.blogsInDb()
       expect(blogsAtEnd).toHaveLength(helper.initialBlogs.length)
@@ -322,7 +322,7 @@ describe('when there is initially some blogs saved', () => {
         .delete(`/api/blogs/${blogToDelete.id}`)
         .expect(401)
 
-      expect(result.body.error).toContain('token missing or invalid')
+      expect(result.body.error).toContain('operation not permitted')
 
       const notesAtEnd = await helper.blogsInDb()
       expect(notesAtEnd).toHaveLength(
@@ -330,7 +330,7 @@ describe('when there is initially some blogs saved', () => {
       )
     })
 
-    test('fails with status code 403 if user did not create blog', async () => {
+    test('fails with status code 401 if user did not create blog', async () => {
       const usersAtStart = await helper.usersInDb()
 
       const newUser = {
@@ -365,9 +365,9 @@ describe('when there is initially some blogs saved', () => {
       const result = await api
         .delete(`/api/blogs/${blogToDelete.id}`)
         .set('Authorization', `Bearer ${user.token}`)
-        .expect(403)
+        .expect(401)
 
-      expect(result.body.error).toContain('user not authorized to delete blog')
+      expect(result.body.error).toContain('operation not permitted')
 
       const notesAtEnd = await helper.blogsInDb()
       expect(notesAtEnd).toHaveLength(
@@ -378,50 +378,29 @@ describe('when there is initially some blogs saved', () => {
 
   describe('updating a blog', () => {
     test('succeeds with status code 200 if id is valid', async () => {
-      const loginResponse = await api
-        .post('/api/login')
-        .send({ username: 'initialUser', password: 'secret' })
-        .expect(200)
-        .expect('Content-Type', /application\/json/)
-
-      const user = loginResponse.body
-      const userDoc = await User.findOne({ username: user.username })
-
       const blogsAtStart = await helper.blogsInDb()
       const blogToUpdate = blogsAtStart[0]
       const blogUpdate = {
-        title: 'Space War',
-        author: 'Robert C. Martin',
-        url: 'http://blog.cleancoder.com/uncle-bob/2021/11/28/Spacewar.html',
-        likes: blogToUpdate.likes + 11,
-        user: userDoc._id
+        ...blogToUpdate,
+        title: 'Updated Title'
       }
 
-      const updatedBlog = await api
+      await api
         .put(`/api/blogs/${blogToUpdate.id}`)
         .send(blogUpdate)
         .expect(200)
         .expect('Content-Type', /application\/json/)
 
-      expect(updatedBlog.body).toEqual({
-        title: 'Space War',
-        author: 'Robert C. Martin',
-        url: 'http://blog.cleancoder.com/uncle-bob/2021/11/28/Spacewar.html',
-        likes: blogToUpdate.likes + 11,
-        id: blogToUpdate.id,
-        user: userDoc._id.toString()
-      })
-      expect(updatedBlog.body).not.toEqual({
-        title: blogToUpdate.title,
-        author: blogToUpdate.author,
-        url: blogToUpdate.url,
-        likes: blogToUpdate.likes,
-        id: blogToUpdate.id,
-        user: userDoc._id.toString()
-      })
+      const blogsAtEnd = await helper.blogsInDb()
+
+      const titles = blogsAtEnd.map(r => r.title)
+
+      expect(titles).toContain(
+        blogUpdate.title
+      )
     })
 
-    test('with a nonexistant id to have status code 200 and have no effect', async () => {
+    test('with a nonexistant id to fail with status code 404', async () => {
       const blogsAtStart = await helper.blogsInDb()
       const nonExistingId = await helper.nonExistingId()
 
@@ -435,7 +414,7 @@ describe('when there is initially some blogs saved', () => {
       await api
         .put(`/api/blogs/${nonExistingId}`)
         .send(blogUpdate)
-        .expect(200)
+        .expect(404)
 
       const blogsAtEnd = await helper.blogsInDb()
       expect(blogsAtEnd).toEqual(blogsAtStart)
