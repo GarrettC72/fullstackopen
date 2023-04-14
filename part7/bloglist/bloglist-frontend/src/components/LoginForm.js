@@ -40,7 +40,9 @@ const LoginForm = ({ createLogin, info }) => {
             onChange={({ target }) => setPassword(target.value)}
           />
         </div>
-        <button id="login-button" type="submit">login</button>
+        <button id="login-button" type="submit">
+          login
+        </button>
       </form>
     </div>
   )
@@ -48,7 +50,7 @@ const LoginForm = ({ createLogin, info }) => {
 
 LoginForm.propTypes = {
   createLogin: PropTypes.func.isRequired,
-  info: PropTypes.object.isRequired
+  info: PropTypes.object.isRequired,
 }
 
 export default LoginForm

@@ -37,7 +37,7 @@ const initialBlogs = [
     author: 'Robert C. Martin',
     url: 'http://blog.cleancoder.com/uncle-bob/2016/05/01/TypeWars.html',
     likes: 2,
-  }
+  },
 ]
 
 const nonExistingId = async () => {
@@ -56,14 +56,17 @@ const nonExistingId = async () => {
 
 const blogsInDb = async () => {
   const blogs = await Blog.find({})
-  return blogs.map(blog => blog.toJSON())
+  return blogs.map((blog) => blog.toJSON())
 }
 
 const usersInDb = async () => {
   const users = await User.find({})
-  return users.map(user => user.toJSON())
+  return users.map((user) => user.toJSON())
 }
 
 module.exports = {
-  initialBlogs, blogsInDb, nonExistingId, usersInDb
+  initialBlogs,
+  blogsInDb,
+  nonExistingId,
+  usersInDb,
 }

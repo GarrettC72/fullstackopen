@@ -15,10 +15,17 @@ describe('when there is initially some blogs saved', () => {
     await User.deleteMany({})
 
     const passwordHash = await bcrypt.hash('secret', 10)
-    const user = new User({ name: 'Initial User', username: 'initialUser', passwordHash })
+    const user = new User({
+      name: 'Initial User',
+      username: 'initialUser',
+      passwordHash,
+    })
 
     const savedUser = await user.save()
-    const initialUserBlogs = helper.initialBlogs.map(blog => ({ ...blog, user: savedUser._id }))
+    const initialUserBlogs = helper.initialBlogs.map((blog) => ({
+      ...blog,
+      user: savedUser._id,
+    }))
     await Blog.insertMany(initialUserBlogs)
   })
 
@@ -31,7 +38,7 @@ describe('when there is initially some blogs saved', () => {
     expect(response.body).toHaveLength(helper.initialBlogs.length)
   })
 
-  test('all blogs have a property named \'id\'', async () => {
+  test("all blogs have a property named 'id'", async () => {
     const response = await api.get('/api/blogs')
 
     response.body.forEach((blog) => expect(blog.id).toBeDefined())
@@ -44,7 +51,7 @@ describe('when there is initially some blogs saved', () => {
       const newUser = {
         username: 'garrchen',
         name: 'Garrett Chen',
-        password: 'salainen'
+        password: 'salainen',
       }
 
       await api
@@ -56,7 +63,7 @@ describe('when there is initially some blogs saved', () => {
       const usersAtEnd = await helper.usersInDb()
       expect(usersAtEnd).toHaveLength(usersAtStart.length + 1)
 
-      const usernames = usersAtEnd.map(u => u.username)
+      const usernames = usersAtEnd.map((u) => u.username)
       expect(usernames).toContain(newUser.username)
 
       const loginResponse = await api
@@ -69,7 +76,7 @@ describe('when there is initially some blogs saved', () => {
       const userDoc = await User.findOne({ username: user.username })
 
       const newBlog = {
-        title: 'Dijkstra\'s Algorithm',
+        title: "Dijkstra's Algorithm",
         author: 'Robert C. Martin',
         url: 'http://blog.cleancoder.com/uncle-bob/2016/10/26/DijkstrasAlg.html',
         likes: 6,
@@ -86,19 +93,15 @@ describe('when there is initially some blogs saved', () => {
 
       expect(blogsAtEnd).toHaveLength(helper.initialBlogs.length + 1)
 
-      const titles = blogsAtEnd.map(blog => blog.title)
-      const urls = blogsAtEnd.map(blog => blog.url)
-      const users = blogsAtEnd.map(blog => blog.user)
+      const titles = blogsAtEnd.map((blog) => blog.title)
+      const urls = blogsAtEnd.map((blog) => blog.url)
+      const users = blogsAtEnd.map((blog) => blog.user)
 
-      expect(titles).toContain(
-        'Dijkstra\'s Algorithm'
-      )
+      expect(titles).toContain("Dijkstra's Algorithm")
       expect(urls).toContain(
         'http://blog.cleancoder.com/uncle-bob/2016/10/26/DijkstrasAlg.html'
       )
-      expect(users).toContainEqual(
-        userDoc._id
-      )
+      expect(users).toContainEqual(userDoc._id)
     })
 
     test('with missing likes data will default to zero likes', async () => {
@@ -107,7 +110,7 @@ describe('when there is initially some blogs saved', () => {
       const newUser = {
         username: 'garrchen',
         name: 'Garrett Chen',
-        password: 'salainen'
+        password: 'salainen',
       }
 
       await api
@@ -119,7 +122,7 @@ describe('when there is initially some blogs saved', () => {
       const usersAtEnd = await helper.usersInDb()
       expect(usersAtEnd).toHaveLength(usersAtStart.length + 1)
 
-      const usernames = usersAtEnd.map(u => u.username)
+      const usernames = usersAtEnd.map((u) => u.username)
       expect(usernames).toContain(newUser.username)
 
       const loginResponse = await api
@@ -148,19 +151,15 @@ describe('when there is initially some blogs saved', () => {
 
       expect(blogsAtEnd).toHaveLength(helper.initialBlogs.length + 1)
 
-      const titles = blogsAtEnd.map(blog => blog.title)
-      const urls = blogsAtEnd.map(blog => blog.url)
-      const users = blogsAtEnd.map(blog => blog.user)
+      const titles = blogsAtEnd.map((blog) => blog.title)
+      const urls = blogsAtEnd.map((blog) => blog.url)
+      const users = blogsAtEnd.map((blog) => blog.user)
 
-      expect(titles).toContain(
-        'Integers and Estimates'
-      )
+      expect(titles).toContain('Integers and Estimates')
       expect(urls).toContain(
         'http://blog.cleancoder.com/uncle-bob/2018/06/21/IntegersAndEstimates.html'
       )
-      expect(users).toContainEqual(
-        userDoc._id
-      )
+      expect(users).toContainEqual(userDoc._id)
 
       const savedBlog = response.body
 
@@ -180,7 +179,7 @@ describe('when there is initially some blogs saved', () => {
       const blogWithoutTitle = {
         author: 'Robert C. Martin',
         url: 'http://blog.cleancoder.com/uncle-bob/2018/06/21/IntegersAndEstimates.html',
-        likes: 8
+        likes: 8,
       }
 
       const result = await api
@@ -207,7 +206,7 @@ describe('when there is initially some blogs saved', () => {
       const blogWithoutUrl = {
         title: 'Integers and Estimates',
         author: 'Robert C. Martin',
-        likes: 8
+        likes: 8,
       }
 
       const result = await api
@@ -224,16 +223,13 @@ describe('when there is initially some blogs saved', () => {
 
     test('will fail with status code 401 if token is not provided', async () => {
       const newBlog = {
-        title: 'Dijkstra\'s Algorithm',
+        title: "Dijkstra's Algorithm",
         author: 'Robert C. Martin',
         url: 'http://blog.cleancoder.com/uncle-bob/2016/10/26/DijkstrasAlg.html',
         likes: 6,
       }
 
-      const result = await api
-        .post('/api/blogs')
-        .send(newBlog)
-        .expect(401)
+      const result = await api.post('/api/blogs').send(newBlog).expect(401)
 
       expect(result.body.error).toContain('operation not permitted')
 
@@ -261,9 +257,7 @@ describe('when there is initially some blogs saved', () => {
         .expect(204)
 
       const notesAtEnd = await helper.blogsInDb()
-      expect(notesAtEnd).toHaveLength(
-        helper.initialBlogs.length - 1
-      )
+      expect(notesAtEnd).toHaveLength(helper.initialBlogs.length - 1)
     })
 
     test('with a nonexistant id to fail with status code 404 and have no effect', async () => {
@@ -285,9 +279,7 @@ describe('when there is initially some blogs saved', () => {
       expect(result.body.error).toContain('blog not in database')
 
       const notesAtEnd = await helper.blogsInDb()
-      expect(notesAtEnd).toHaveLength(
-        helper.initialBlogs.length
-      )
+      expect(notesAtEnd).toHaveLength(helper.initialBlogs.length)
     })
 
     test('fails with status code 400 if id is invalid', async () => {
@@ -309,9 +301,7 @@ describe('when there is initially some blogs saved', () => {
       expect(result.body.error).toContain('malformatted id')
 
       const notesAtEnd = await helper.blogsInDb()
-      expect(notesAtEnd).toHaveLength(
-        helper.initialBlogs.length
-      )
+      expect(notesAtEnd).toHaveLength(helper.initialBlogs.length)
     })
 
     test('fails with status code 401 if token is not provided', async () => {
@@ -325,9 +315,7 @@ describe('when there is initially some blogs saved', () => {
       expect(result.body.error).toContain('operation not permitted')
 
       const notesAtEnd = await helper.blogsInDb()
-      expect(notesAtEnd).toHaveLength(
-        helper.initialBlogs.length
-      )
+      expect(notesAtEnd).toHaveLength(helper.initialBlogs.length)
     })
 
     test('fails with status code 401 if user did not create blog', async () => {
@@ -336,7 +324,7 @@ describe('when there is initially some blogs saved', () => {
       const newUser = {
         username: 'garrchen',
         name: 'Garrett Chen',
-        password: 'salainen'
+        password: 'salainen',
       }
 
       await api
@@ -348,7 +336,7 @@ describe('when there is initially some blogs saved', () => {
       const usersAtEnd = await helper.usersInDb()
       expect(usersAtEnd).toHaveLength(usersAtStart.length + 1)
 
-      const usernames = usersAtEnd.map(u => u.username)
+      const usernames = usersAtEnd.map((u) => u.username)
       expect(usernames).toContain(newUser.username)
 
       const loginResponse = await api
@@ -370,9 +358,7 @@ describe('when there is initially some blogs saved', () => {
       expect(result.body.error).toContain('operation not permitted')
 
       const notesAtEnd = await helper.blogsInDb()
-      expect(notesAtEnd).toHaveLength(
-        helper.initialBlogs.length
-      )
+      expect(notesAtEnd).toHaveLength(helper.initialBlogs.length)
     })
   })
 
@@ -382,7 +368,7 @@ describe('when there is initially some blogs saved', () => {
       const blogToUpdate = blogsAtStart[0]
       const blogUpdate = {
         ...blogToUpdate,
-        title: 'Updated Title'
+        title: 'Updated Title',
       }
 
       await api
@@ -393,11 +379,9 @@ describe('when there is initially some blogs saved', () => {
 
       const blogsAtEnd = await helper.blogsInDb()
 
-      const titles = blogsAtEnd.map(r => r.title)
+      const titles = blogsAtEnd.map((r) => r.title)
 
-      expect(titles).toContain(
-        blogUpdate.title
-      )
+      expect(titles).toContain(blogUpdate.title)
     })
 
     test('with a nonexistant id to fail with status code 404', async () => {
@@ -408,13 +392,10 @@ describe('when there is initially some blogs saved', () => {
         title: 'Space War',
         author: 'Robert C. Martin',
         url: 'http://blog.cleancoder.com/uncle-bob/2021/11/28/Spacewar.html',
-        likes: 11
+        likes: 11,
       }
 
-      await api
-        .put(`/api/blogs/${nonExistingId}`)
-        .send(blogUpdate)
-        .expect(404)
+      await api.put(`/api/blogs/${nonExistingId}`).send(blogUpdate).expect(404)
 
       const blogsAtEnd = await helper.blogsInDb()
       expect(blogsAtEnd).toEqual(blogsAtStart)
@@ -428,13 +409,10 @@ describe('when there is initially some blogs saved', () => {
         title: 'Space War',
         author: 'Robert C. Martin',
         url: 'http://blog.cleancoder.com/uncle-bob/2021/11/28/Spacewar.html',
-        likes: 11
+        likes: 11,
       }
 
-      await api
-        .put(`/api/blogs/${invalidId}`)
-        .send(blogUpdate)
-        .expect(400)
+      await api.put(`/api/blogs/${invalidId}`).send(blogUpdate).expect(400)
 
       const blogsAtEnd = await helper.blogsInDb()
       expect(blogsAtEnd).toEqual(blogsAtStart)
@@ -461,7 +439,7 @@ describe('when there is initially one user in db', () => {
     expect(response.body).toHaveLength(1)
   })
 
-  test('all users have a property named \'id\'', async () => {
+  test("all users have a property named 'id'", async () => {
     const response = await api.get('/api/users')
 
     response.body.forEach((user) => expect(user.id).toBeDefined())
@@ -474,7 +452,7 @@ describe('when there is initially one user in db', () => {
       const newUser = {
         username: 'garrchen',
         name: 'Garrett Chen',
-        password: 'salainen'
+        password: 'salainen',
       }
 
       await api
@@ -486,7 +464,7 @@ describe('when there is initially one user in db', () => {
       const usersAtEnd = await helper.usersInDb()
       expect(usersAtEnd).toHaveLength(usersAtStart.length + 1)
 
-      const usernames = usersAtEnd.map(u => u.username)
+      const usernames = usersAtEnd.map((u) => u.username)
       expect(usernames).toContain(newUser.username)
     })
 
@@ -525,7 +503,9 @@ describe('when there is initially one user in db', () => {
         .expect(400)
         .expect('Content-Type', /application\/json/)
 
-      expect(result.body.error).toContain('Please provide both a username and password')
+      expect(result.body.error).toContain(
+        'Please provide both a username and password'
+      )
 
       const usersAtEnd = await helper.usersInDb()
       expect(usersAtEnd).toEqual(usersAtStart)
@@ -545,7 +525,9 @@ describe('when there is initially one user in db', () => {
         .expect(400)
         .expect('Content-Type', /application\/json/)
 
-      expect(result.body.error).toContain('Please provide both a username and password')
+      expect(result.body.error).toContain(
+        'Please provide both a username and password'
+      )
 
       const usersAtEnd = await helper.usersInDb()
       expect(usersAtEnd).toEqual(usersAtStart)
@@ -566,7 +548,9 @@ describe('when there is initially one user in db', () => {
         .expect(400)
         .expect('Content-Type', /application\/json/)
 
-      expect(result.body.error).toContain(`Path \`username\` (\`${newUser.username}\`) is shorter than the minimum allowed length`)
+      expect(result.body.error).toContain(
+        `Path \`username\` (\`${newUser.username}\`) is shorter than the minimum allowed length`
+      )
 
       const usersAtEnd = await helper.usersInDb()
       expect(usersAtEnd).toEqual(usersAtStart)
@@ -587,13 +571,14 @@ describe('when there is initially one user in db', () => {
         .expect(400)
         .expect('Content-Type', /application\/json/)
 
-      expect(result.body.error).toContain('Password must be at least 3 characters long')
+      expect(result.body.error).toContain(
+        'Password must be at least 3 characters long'
+      )
 
       const usersAtEnd = await helper.usersInDb()
       expect(usersAtEnd).toEqual(usersAtStart)
     })
   })
-
 })
 
 afterAll(() => {

@@ -10,34 +10,50 @@ const totalLikes = (blogs) => {
 }
 
 const favoriteBlog = (blogs) => {
-  const favoriteBlog = blogs.reduce((result, blog) => !result || result.likes < blog.likes ? blog : result, null)
-  return !favoriteBlog ? favoriteBlog : {
+  if (blogs.length === 0) {
+    return null
+  }
+
+  const favoriteBlog = blogs.reduce(
+    (result, blog) => (!result || result.likes < blog.likes ? blog : result),
+    null
+  )
+  return {
     title: favoriteBlog.title,
     author: favoriteBlog.author,
-    likes: favoriteBlog.likes
+    url: favoriteBlog.url,
+    likes: favoriteBlog.likes,
   }
 }
 
 const mostBlogs = (blogs) => {
-  const groupedAuthors = _.countBy(blogs, blog => blog.author)
+  const groupedAuthors = _.countBy(blogs, (blog) => blog.author)
   const authors = _.map(Object.entries(groupedAuthors), (author) => {
     return {
       author: author[0],
-      blogs: author[1]
+      blogs: author[1],
     }
   })
-  return authors.reduce((result, author) => !result || result.blogs < author.blogs ? author : result, null)
+  return authors.reduce(
+    (result, author) =>
+      !result || result.blogs < author.blogs ? author : result,
+    null
+  )
 }
 
 const mostLikes = (blogs) => {
-  const groupedAuthors = _.groupBy(blogs, blog => blog.author)
+  const groupedAuthors = _.groupBy(blogs, (blog) => blog.author)
   const authors = _.map(Object.entries(groupedAuthors), (author) => {
     return {
       author: author[0],
-      likes: author[1].reduce((sum, blog) => sum + blog.likes, 0)
+      likes: author[1].reduce((sum, blog) => sum + blog.likes, 0),
     }
   })
-  return authors.reduce((result, author) => !result || result.likes < author.likes ? author : result, null)
+  return authors.reduce(
+    (result, author) =>
+      !result || result.likes < author.likes ? author : result,
+    null
+  )
 }
 
 module.exports = {
@@ -45,5 +61,5 @@ module.exports = {
   totalLikes,
   favoriteBlog,
   mostBlogs,
-  mostLikes
+  mostLikes,
 }

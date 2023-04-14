@@ -9,7 +9,7 @@ const Blog = ({ updateBlog, deleteBlog, blog, canRemove }) => {
     paddingLeft: 2,
     border: 'solid',
     borderWidth: 1,
-    marginBottom: 5
+    marginBottom: 5,
   }
 
   const likeBlog = () => {
@@ -20,7 +20,7 @@ const Blog = ({ updateBlog, deleteBlog, blog, canRemove }) => {
   }
 
   const handleDelete = () => {
-    if(window.confirm(`Remove blog ${blog.title} by ${blog.author}`)) {
+    if (window.confirm(`Remove blog ${blog.title} by ${blog.author}`)) {
       deleteBlog(blog)
     }
   }
@@ -29,9 +29,18 @@ const Blog = ({ updateBlog, deleteBlog, blog, canRemove }) => {
     return (
       <div>
         <a href={blog.url}>{blog.url}</a>
-        <div>likes {blog.likes}<button className="like-button" onClick={likeBlog}>like</button></div>
+        <div>
+          likes {blog.likes}
+          <button className="like-button" onClick={likeBlog}>
+            like
+          </button>
+        </div>
         <div>{blog.user && blog.user.name}</div>
-        {canRemove && <button className="delete-button" onClick={handleDelete}>remove</button>}
+        {canRemove && (
+          <button className="delete-button" onClick={handleDelete}>
+            remove
+          </button>
+        )}
       </div>
     )
   }
@@ -56,9 +65,9 @@ Blog.propTypes = {
     title: PropTypes.string,
     author: PropTypes.string,
     url: PropTypes.string,
-    likes: PropTypes.number
+    likes: PropTypes.number,
   }),
-  canRemove: PropTypes.bool.isRequired
+  canRemove: PropTypes.bool.isRequired,
 }
 
 export default Blog

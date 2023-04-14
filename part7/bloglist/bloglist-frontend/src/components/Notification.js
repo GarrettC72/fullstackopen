@@ -12,7 +12,7 @@ const Notification = ({ info }) => {
     borderStyle: 'solid',
     borderRadius: 5,
     padding: 10,
-    marginBottom: 10
+    marginBottom: 10,
   }
 
   return (
@@ -23,7 +23,7 @@ const Notification = ({ info }) => {
 }
 
 Notification.propTypes = {
-  info: PropTypes.object.isRequired
+  info: PropTypes.object.isRequired,
 }
 
 export default Notification

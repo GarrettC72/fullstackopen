@@ -13,8 +13,8 @@ describe('<Blog />', () => {
       likes: 15,
       user: {
         name: 'Garrett Chen',
-        username: 'garrchen'
-      }
+        username: 'garrchen',
+      },
     }
 
     render(<Blog blog={blog} />)
@@ -22,7 +22,9 @@ describe('<Blog />', () => {
     const element = screen.getByText('First class tests Robert C. Martin')
     expect(element).toBeDefined()
 
-    const urlElement = screen.queryByText('http://blog.cleancoder.com/uncle-bob/2017/05/05/TestDefinitions.html')
+    const urlElement = screen.queryByText(
+      'http://blog.cleancoder.com/uncle-bob/2017/05/05/TestDefinitions.html'
+    )
     expect(urlElement).toBeNull()
 
     const likeElement = screen.queryByText('15', { exact: false })
@@ -37,12 +39,12 @@ describe('<Blog />', () => {
       likes: 15,
       user: {
         name: 'Garrett Chen',
-        username: 'garrchen'
-      }
+        username: 'garrchen',
+      },
     }
 
     const initialUser = {
-      username: 'garrchen'
+      username: 'garrchen',
     }
 
     render(<Blog blog={blog} user={initialUser} />)
@@ -52,7 +54,9 @@ describe('<Blog />', () => {
     const viewButton = screen.getByText('view')
     await user.click(viewButton)
 
-    const urlElement = screen.getByText('http://blog.cleancoder.com/uncle-bob/2017/05/05/TestDefinitions.html')
+    const urlElement = screen.getByText(
+      'http://blog.cleancoder.com/uncle-bob/2017/05/05/TestDefinitions.html'
+    )
     expect(urlElement).toBeDefined()
 
     const likeElement = screen.getByText('likes 15')
@@ -67,12 +71,12 @@ describe('<Blog />', () => {
       likes: 15,
       user: {
         name: 'Garrett Chen',
-        username: 'garrchen'
-      }
+        username: 'garrchen',
+      },
     }
 
     const initialUser = {
-      username: 'garrchen'
+      username: 'garrchen',
     }
 
     const mockHandler = jest.fn()

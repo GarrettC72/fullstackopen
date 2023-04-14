@@ -3,17 +3,16 @@ const Blog = require('../models/blog')
 const { userExtractor } = require('../utils/middleware')
 
 blogsRouter.get('/', async (request, response) => {
-  const blogs = await Blog
-    .find({})
-    .populate('user', { username: 1, name: 1 })
+  const blogs = await Blog.find({}).populate('user', { username: 1, name: 1 })
 
   response.json(blogs)
 })
 
 blogsRouter.get('/:id', async (request, response) => {
-  const blog = await Blog
-    .findById(request.params.id)
-    .populate('user', { username: 1, name: 1 })
+  const blog = await Blog.findById(request.params.id).populate('user', {
+    username: 1,
+    name: 1,
+  })
 
   if (blog) {
     response.json(blog)
@@ -26,7 +25,9 @@ blogsRouter.post('/', userExtractor, async (request, response) => {
   const { title, author, url, likes } = request.body
 
   const blog = new Blog({
-    title, author, url,
+    title,
+    author,
+    url,
     likes: likes ?? 0,
   })
 
@@ -43,7 +44,10 @@ blogsRouter.post('/', userExtractor, async (request, response) => {
   user.blogs = user.blogs.concat(createdBlog._id)
   await user.save()
 
-  createdBlog = await Blog.findById(createdBlog._id).populate('user', { username: 1, name: 1 })
+  createdBlog = await Blog.findById(createdBlog._id).populate('user', {
+    username: 1,
+    name: 1,
+  })
 
   response.status(201).json(createdBlog)
 })
@@ -60,7 +64,9 @@ blogsRouter.delete('/:id', userExtractor, async (request, response) => {
     return response.status(401).json({ error: 'operation not permitted' })
   }
 
-  user.blogs = user.blogs.filter(otherBlog => otherBlog.toString() !== blog.id.toString())
+  user.blogs = user.blogs.filter(
+    (otherBlog) => otherBlog.toString() !== blog.id.toString()
+  )
 
   await user.save()
   await blog.remove()
@@ -81,7 +87,10 @@ blogsRouter.put('/:id', async (request, response) => {
     return response.status(404).json({ error: 'blog not in database' })
   }
 
-  updatedBlog = await Blog.findById(updatedBlog._id).populate('user', { username: 1, name: 1 })
+  updatedBlog = await Blog.findById(updatedBlog._id).populate('user', {
+    username: 1,
+    name: 1,
+  })
 
   response.json(updatedBlog)
 })

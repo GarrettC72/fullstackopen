@@ -12,7 +12,7 @@ const BlogForm = ({ createBlog }) => {
       title: newTitle,
       author: newAuthor,
       url: newUrl,
-      likes: 0
+      likes: 0,
     })
 
     setNewTitle('')
@@ -58,14 +58,16 @@ const BlogForm = ({ createBlog }) => {
             placeholder="write blog url here"
           />
         </div>
-        <button id="create-blog-button" type="submit">create</button>
+        <button id="create-blog-button" type="submit">
+          create
+        </button>
       </form>
     </div>
   )
 }
 
 BlogForm.propTypes = {
-  createBlog: PropTypes.func.isRequired
+  createBlog: PropTypes.func.isRequired,
 }
 
 export default BlogForm

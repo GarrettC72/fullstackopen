@@ -13,9 +13,7 @@ const App = () => {
   const [user, setUser] = useState(null)
 
   useEffect(() => {
-    blogService.getAll().then(blogs =>
-      setBlogs( blogs )
-    )
+    blogService.getAll().then((blogs) => setBlogs(blogs))
   }, [])
 
   useEffect(() => {
@@ -29,9 +27,10 @@ const App = () => {
 
   const blogFormRef = useRef()
 
-  const notifyWith = (message, type='info') => {
+  const notifyWith = (message, type = 'info') => {
     setInfo({
-      message, type
+      message,
+      type,
     })
 
     setTimeout(() => {
@@ -42,12 +41,11 @@ const App = () => {
   const handleLogin = async (username, password) => {
     try {
       const user = await loginService.login({
-        username, password,
+        username,
+        password,
       })
 
-      window.localStorage.setItem(
-        'loggedBlogappUser', JSON.stringify(user)
-      )
+      window.localStorage.setItem('loggedBlogappUser', JSON.stringify(user))
       blogService.setToken(user.token)
       setUser(user)
       notifyWith(`Logged in as ${user.name}`)
@@ -79,9 +77,14 @@ const App = () => {
       const updatedBlog = await blogService.update(blogObject)
 
       notifyWith(`blog ${blogObject.title} by ${blogObject.author} was liked`)
-      setBlogs(blogs.map(blog => blog.id !== blogObject.id ? blog : updatedBlog))
+      setBlogs(
+        blogs.map((blog) => (blog.id !== blogObject.id ? blog : updatedBlog))
+      )
     } catch (exception) {
-      notifyWith(`blog ${blogObject.title} by ${blogObject.author} has already been removed`, 'error')
+      notifyWith(
+        `blog ${blogObject.title} by ${blogObject.author} has already been removed`,
+        'error'
+      )
     }
   }
 
@@ -90,19 +93,14 @@ const App = () => {
       await blogService.deleteObject(blog.id)
 
       notifyWith(`Removed ${blog.title} by ${blog.author}`)
-      setBlogs(blogs.filter(b => b.id !== blog.id))
+      setBlogs(blogs.filter((b) => b.id !== blog.id))
     } catch (exception) {
       notifyWith(exception.response.data.error, 'error')
     }
   }
 
   if (user === null) {
-    return (
-      <LoginForm
-        createLogin={handleLogin}
-        info={info}
-      />
-    )
+    return <LoginForm createLogin={handleLogin} info={info} />
   }
 
   const sortedBlogs = blogs.sort((a, b) => b.likes - a.likes)
@@ -112,11 +110,13 @@ const App = () => {
       <h2>blogs</h2>
       <Notification info={info} />
 
-      <p>{user.name} logged in<button onClick={handleLogout}>logout</button></p>
+      <p>
+        {user.name} logged in<button onClick={handleLogout}>logout</button>
+      </p>
       <Toggleable buttonLabel="create new blog" ref={blogFormRef}>
         <BlogForm createBlog={addBlog} />
       </Toggleable>
-      {sortedBlogs.map(blog =>
+      {sortedBlogs.map((blog) => (
         <Blog
           key={blog.id}
           updateBlog={updateBlog}
@@ -124,7 +124,7 @@ const App = () => {
           blog={blog}
           canRemove={user && blog.user.username === user.username}
         />
-      )}
+      ))}
     </div>
   )
 }

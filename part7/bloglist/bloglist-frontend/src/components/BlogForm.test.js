@@ -17,11 +17,16 @@ test('<BlogForm /> updates parent state and calls onSubmit', async () => {
 
   await user.type(titleInput, 'First class tests')
   await user.type(authorInput, 'Robert C. Martin')
-  await user.type(urlInput, 'http://blog.cleancoder.com/uncle-bob/2017/05/05/TestDefinitions.html')
+  await user.type(
+    urlInput,
+    'http://blog.cleancoder.com/uncle-bob/2017/05/05/TestDefinitions.html'
+  )
   await user.click(sendButton)
 
   expect(createBlog.mock.calls).toHaveLength(1)
   expect(createBlog.mock.calls[0][0].title).toBe('First class tests')
   expect(createBlog.mock.calls[0][0].author).toBe('Robert C. Martin')
-  expect(createBlog.mock.calls[0][0].url).toBe('http://blog.cleancoder.com/uncle-bob/2017/05/05/TestDefinitions.html')
+  expect(createBlog.mock.calls[0][0].url).toBe(
+    'http://blog.cleancoder.com/uncle-bob/2017/05/05/TestDefinitions.html'
+  )
 })

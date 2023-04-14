@@ -6,11 +6,17 @@ usersRouter.post('/', async (request, response) => {
   const { username, name, password } = request.body
 
   if (!username || !password) {
-    return response.status(400).send({ error: 'Please provide both a username and password' }).end()
+    return response
+      .status(400)
+      .send({ error: 'Please provide both a username and password' })
+      .end()
   }
 
   if (password.length < 3) {
-    return response.status(400).send({ error: 'Password must be at least 3 characters long' }).end()
+    return response
+      .status(400)
+      .send({ error: 'Password must be at least 3 characters long' })
+      .end()
   }
 
   const saltRounds = 10
@@ -19,7 +25,7 @@ usersRouter.post('/', async (request, response) => {
   const user = new User({
     username,
     name,
-    passwordHash
+    passwordHash,
   })
 
   const savedUser = await user.save()
@@ -28,15 +34,23 @@ usersRouter.post('/', async (request, response) => {
 })
 
 usersRouter.get('/', async (request, response) => {
-  const users = await User.find({})
-    .populate('blogs', { title: 1, author: 1, url: 1, likes: 1 })
+  const users = await User.find({}).populate('blogs', {
+    title: 1,
+    author: 1,
+    url: 1,
+    likes: 1,
+  })
 
   response.json(users)
 })
 
 usersRouter.get('/:id', async (request, response) => {
-  const user = await User.findById(request.params.id)
-    .populate('blogs', { title: 1, author: 1, url: 1, likes: 1 })
+  const user = await User.findById(request.params.id).populate('blogs', {
+    title: 1,
+    author: 1,
+    url: 1,
+    likes: 1,
+  })
 
   if (user) {
     response.json(user)
