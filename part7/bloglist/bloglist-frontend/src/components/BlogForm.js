@@ -2,22 +2,17 @@ import { useState } from 'react'
 import PropTypes from 'prop-types'
 
 const BlogForm = ({ createBlog }) => {
-  const [newTitle, setNewTitle] = useState('')
-  const [newAuthor, setNewAuthor] = useState('')
-  const [newUrl, setNewUrl] = useState('')
+  const [title, setTitle] = useState('')
+  const [author, setAuthor] = useState('')
+  const [url, setUrl] = useState('')
 
   const addBlog = async (event) => {
     event.preventDefault()
-    await createBlog({
-      title: newTitle,
-      author: newAuthor,
-      url: newUrl,
-      likes: 0,
-    })
+    await createBlog({ title, author, url })
 
-    setNewTitle('')
-    setNewAuthor('')
-    setNewUrl('')
+    setTitle('')
+    setAuthor('')
+    setUrl('')
   }
 
   return (
@@ -30,9 +25,9 @@ const BlogForm = ({ createBlog }) => {
           <input
             id="title"
             type="text"
-            value={newTitle}
+            value={title}
             name="Title"
-            onChange={({ target }) => setNewTitle(target.value)}
+            onChange={({ target }) => setTitle(target.value)}
             placeholder="write blog title here"
           />
         </div>
@@ -41,9 +36,9 @@ const BlogForm = ({ createBlog }) => {
           <input
             id="author"
             type="text"
-            value={newAuthor}
+            value={author}
             name="Author"
-            onChange={({ target }) => setNewAuthor(target.value)}
+            onChange={({ target }) => setAuthor(target.value)}
             placeholder="write blog author here"
           />
         </div>
@@ -52,9 +47,9 @@ const BlogForm = ({ createBlog }) => {
           <input
             id="url"
             type="text"
-            value={newUrl}
+            value={url}
             name="Url"
-            onChange={({ target }) => setNewUrl(target.value)}
+            onChange={({ target }) => setUrl(target.value)}
             placeholder="write blog url here"
           />
         </div>
