@@ -16,6 +16,7 @@ const Blog = ({ updateBlog, deleteBlog, blog, canRemove }) => {
     updateBlog({
       ...blog,
       likes: blog.likes + 1,
+      user: blog.user.id
     })
   }
 
