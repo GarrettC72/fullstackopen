@@ -8,17 +8,17 @@ import Toggleable from './components/Toggleable'
 import blogService from './services/blogs'
 import loginService from './services/login'
 
+import { useDispatch, useSelector } from 'react-redux'
 import { setNotification } from './reducers/notificationReducer'
-import { useDispatch } from 'react-redux'
+import { initializeBlogs } from './reducers/blogReducer'
 
 const App = () => {
-  const [blogs, setBlogs] = useState([])
   const [user, setUser] = useState(null)
 
   const dispatch = useDispatch()
 
   useEffect(() => {
-    blogService.getAll().then((blogs) => setBlogs(blogs))
+    dispatch(initializeBlogs())
   }, [])
 
   useEffect(() => {
@@ -30,6 +30,9 @@ const App = () => {
     }
   }, [])
 
+  const blogs = useSelector(({ blogs }) => {
+    return blogs.slice().sort((a, b) => b.likes - a.likes)
+  })
   const blogFormRef = useRef()
 
   const handleLogin = async (username, password) => {
@@ -59,45 +62,18 @@ const App = () => {
     dispatch(setNotification({ message: 'logged out' }, 3))
   }
 
-  const addBlog = async (blogObject) => {
-    try {
-      const returnedBlog = await blogService.create(blogObject)
-
-      setBlogs(blogs.concat(returnedBlog))
-      blogFormRef.current.toggleVisibility()
-      dispatch(
-        setNotification(
-          {
-            message: `a new blog ${blogObject.title} by ${blogObject.author} added`,
-          },
-          3
-        )
-      )
-    } catch (exception) {
-      dispatch(
-        setNotification(
-          {
-            message: 'failed to add blog - title or url is missing',
-            type: 'error',
-          },
-          3
-        )
-      )
-    }
-  }
-
   const likeBlog = async (blogObject) => {
     try {
-      const blogUpdate = {
-        ...blogObject,
-        likes: blogObject.likes + 1,
-        user: blogObject.user.id,
-      }
-      const updatedBlog = await blogService.update(blogUpdate)
+      // const blogUpdate = {
+      //   ...blogObject,
+      //   likes: blogObject.likes + 1,
+      //   user: blogObject.user.id,
+      // }
+      // const updatedBlog = await blogService.update(blogUpdate)
 
-      setBlogs(
-        blogs.map((blog) => (blog.id !== blogObject.id ? blog : updatedBlog))
-      )
+      // setBlogs(
+      //   blogs.map((blog) => (blog.id !== blogObject.id ? blog : updatedBlog))
+      // )
       dispatch(
         setNotification(
           {
@@ -124,7 +100,7 @@ const App = () => {
       try {
         await blogService.deleteObject(blog.id)
 
-        setBlogs(blogs.filter((b) => b.id !== blog.id))
+        // setBlogs(blogs.filter((b) => b.id !== blog.id))
         dispatch(
           setNotification(
             { message: `Removed ${blog.title} by ${blog.author}` },
@@ -152,8 +128,6 @@ const App = () => {
     )
   }
 
-  const sortedBlogs = blogs.sort((a, b) => b.likes - a.likes)
-
   return (
     <div>
       <h2>blogs</h2>
@@ -163,9 +137,9 @@ const App = () => {
         {user.name} logged in<button onClick={handleLogout}>logout</button>
       </p>
       <Toggleable buttonLabel="create new blog" ref={blogFormRef}>
-        <BlogForm createBlog={addBlog} />
+        <BlogForm hideBlogForm={() => blogFormRef.current.toggleVisibility()} />
       </Toggleable>
-      {sortedBlogs.map((blog) => (
+      {blogs.map((blog) => (
         <Blog
           key={blog.id}
           likeBlog={() => likeBlog(blog)}
