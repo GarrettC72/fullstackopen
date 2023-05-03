@@ -3,7 +3,6 @@ import PropTypes from 'prop-types'
 import { useDispatch } from 'react-redux'
 
 import { createBlog } from '../reducers/blogReducer'
-import { setNotification } from '../reducers/notificationReducer'
 
 const BlogForm = ({ hideBlogForm }) => {
   const [title, setTitle] = useState('')
@@ -12,30 +11,11 @@ const BlogForm = ({ hideBlogForm }) => {
 
   const dispatch = useDispatch()
 
-  const addBlog = async (event) => {
+  const addBlog = (event) => {
     event.preventDefault()
-    try {
-      dispatch(createBlog({ title, author, url }))
-      dispatch(
-        setNotification(
-          {
-            message: `a new blog ${title} by ${author} added`,
-          },
-          3
-        )
-      )
-      hideBlogForm()
-    } catch (exception) {
-      dispatch(
-        setNotification(
-          {
-            message: 'failed to add blog - title or url is missing',
-            type: 'error',
-          },
-          3
-        )
-      )
-    }
+
+    dispatch(createBlog({ title, author, url }))
+    hideBlogForm()
 
     setTitle('')
     setAuthor('')
@@ -53,7 +33,7 @@ const BlogForm = ({ hideBlogForm }) => {
             id="title"
             type="text"
             value={title}
-            name="Title"
+            name="title"
             onChange={({ target }) => setTitle(target.value)}
             placeholder="write blog title here"
           />
@@ -64,7 +44,7 @@ const BlogForm = ({ hideBlogForm }) => {
             id="author"
             type="text"
             value={author}
-            name="Author"
+            name="author"
             onChange={({ target }) => setAuthor(target.value)}
             placeholder="write blog author here"
           />
@@ -75,7 +55,7 @@ const BlogForm = ({ hideBlogForm }) => {
             id="url"
             type="text"
             value={url}
-            name="Url"
+            name="url"
             onChange={({ target }) => setUrl(target.value)}
             placeholder="write blog url here"
           />
