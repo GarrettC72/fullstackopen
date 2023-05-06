@@ -1,11 +1,14 @@
 import { useState, useEffect, useRef } from 'react'
+
 import Blog from './components/Blog'
 import Notification from './components/Notification'
 import LoginForm from './components/LoginForm'
 import BlogForm from './components/BlogForm'
 import Toggleable from './components/Toggleable'
+
 import blogService from './services/blogs'
 import loginService from './services/login'
+import storageService from './services/storage'
 
 const App = () => {
   const [blogs, setBlogs] = useState([])
@@ -17,12 +20,8 @@ const App = () => {
   }, [])
 
   useEffect(() => {
-    const loggedUserJSON = window.localStorage.getItem('loggedBlogappUser')
-    if (loggedUserJSON) {
-      const user = JSON.parse(loggedUserJSON) || null
-      setUser(user)
-      blogService.setToken(user.token)
-    }
+    const user = storageService.loadUser()
+    setUser(user)
   }, [])
 
   const blogFormRef = useRef()
@@ -45,8 +44,7 @@ const App = () => {
         password,
       })
 
-      window.localStorage.setItem('loggedBlogappUser', JSON.stringify(user))
-      blogService.setToken(user.token)
+      storageService.saveUser(user)
       setUser(user)
       notifyWith(`Logged in as ${user.name}`)
     } catch (exception) {
@@ -55,7 +53,7 @@ const App = () => {
   }
 
   const handleLogout = () => {
-    window.localStorage.removeItem('loggedBlogappUser')
+    storageService.removeUser()
     setUser(null)
     notifyWith('logged out')
   }
@@ -64,43 +62,50 @@ const App = () => {
     try {
       const returnedBlog = await blogService.create(blogObject)
 
-      notifyWith(`a new blog ${blogObject.title} by ${blogObject.author} added`)
       setBlogs(blogs.concat(returnedBlog))
+      notifyWith(`a new blog ${blogObject.title} by ${blogObject.author} added`)
       blogFormRef.current.toggleVisibility()
     } catch (exception) {
       notifyWith('failed to add blog - title or url is missing', 'error')
     }
   }
 
-  const updateBlog = async (blogObject) => {
+  const likeBlog = async (blog) => {
     try {
-      const updatedBlog = await blogService.update(blogObject)
+      const blogUpdate = { ...blog, likes: blog.likes + 1, user: blog.user.id }
+      const updatedBlog = await blogService.update(blogUpdate)
 
-      notifyWith(`blog ${blogObject.title} by ${blogObject.author} was liked`)
-      setBlogs(
-        blogs.map((blog) => (blog.id !== blogObject.id ? blog : updatedBlog))
-      )
+      setBlogs(blogs.map((b) => (b.id === blog.id ? updatedBlog : b)))
+      notifyWith(`blog ${blog.title} by ${blog.author} was liked`)
     } catch (exception) {
       notifyWith(
-        `blog ${blogObject.title} by ${blogObject.author} has already been removed`,
+        `blog ${blog.title} by ${blog.author} has already been removed`,
         'error'
       )
     }
   }
 
   const deleteBlog = async (blog) => {
-    try {
-      await blogService.deleteObject(blog.id)
+    if (window.confirm(`Remove blog ${blog.title} by ${blog.author}`)) {
+      try {
+        await blogService.deleteObject(blog.id)
 
-      notifyWith(`Removed ${blog.title} by ${blog.author}`)
-      setBlogs(blogs.filter((b) => b.id !== blog.id))
-    } catch (exception) {
-      notifyWith(exception.response.data.error, 'error')
+        setBlogs(blogs.filter((b) => b.id !== blog.id))
+        notifyWith(`Removed ${blog.title} by ${blog.author}`)
+      } catch (exception) {
+        notifyWith(exception.response.data.error, 'error')
+      }
     }
   }
 
   if (user === null) {
-    return <LoginForm createLogin={handleLogin} info={info} />
+    return (
+      <div>
+        <h2>log in to application</h2>
+        <Notification info={info} />
+        <LoginForm createLogin={handleLogin} />
+      </div>
+    )
   }
 
   const sortedBlogs = blogs.sort((a, b) => b.likes - a.likes)
@@ -109,7 +114,6 @@ const App = () => {
     <div>
       <h2>blogs</h2>
       <Notification info={info} />
-
       <p>
         {user.name} logged in<button onClick={handleLogout}>logout</button>
       </p>
@@ -119,8 +123,8 @@ const App = () => {
       {sortedBlogs.map((blog) => (
         <Blog
           key={blog.id}
-          updateBlog={updateBlog}
-          deleteBlog={deleteBlog}
+          likeBlog={() => likeBlog(blog)}
+          deleteBlog={() => deleteBlog(blog)}
           blog={blog}
           canRemove={user && blog.user.username === user.username}
         />

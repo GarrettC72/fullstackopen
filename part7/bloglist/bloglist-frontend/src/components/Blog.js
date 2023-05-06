@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import PropTypes from 'prop-types'
 
-const Blog = ({ updateBlog, deleteBlog, blog, canRemove }) => {
+const Blog = ({ likeBlog, deleteBlog, blog, canRemove }) => {
   const [fullView, setFullView] = useState(false)
 
   const blogStyle = {
@@ -10,19 +10,6 @@ const Blog = ({ updateBlog, deleteBlog, blog, canRemove }) => {
     border: 'solid',
     borderWidth: 1,
     marginBottom: 5,
-  }
-
-  const likeBlog = () => {
-    updateBlog({
-      ...blog,
-      likes: blog.likes + 1,
-    })
-  }
-
-  const handleDelete = () => {
-    if (window.confirm(`Remove blog ${blog.title} by ${blog.author}`)) {
-      deleteBlog(blog)
-    }
   }
 
   const extraBlogDetails = () => {
@@ -37,7 +24,7 @@ const Blog = ({ updateBlog, deleteBlog, blog, canRemove }) => {
         </div>
         <div>{blog.user && blog.user.name}</div>
         {canRemove && (
-          <button className="delete-button" onClick={handleDelete}>
+          <button className="delete-button" onClick={deleteBlog}>
             remove
           </button>
         )}
@@ -59,7 +46,7 @@ const Blog = ({ updateBlog, deleteBlog, blog, canRemove }) => {
 }
 
 Blog.propTypes = {
-  updateBlog: PropTypes.func.isRequired,
+  likeBlog: PropTypes.func.isRequired,
   deleteBlog: PropTypes.func.isRequired,
   blog: PropTypes.shape({
     title: PropTypes.string,
@@ -67,7 +54,7 @@ Blog.propTypes = {
     url: PropTypes.string,
     likes: PropTypes.number,
   }),
-  canRemove: PropTypes.bool.isRequired,
+  canRemove: PropTypes.bool,
 }
 
 export default Blog

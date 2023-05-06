@@ -1,23 +1,23 @@
-import { useState } from 'react'
 import PropTypes from 'prop-types'
 
+import { useField } from '../hooks'
+
 const BlogForm = ({ createBlog }) => {
-  const [newTitle, setNewTitle] = useState('')
-  const [newAuthor, setNewAuthor] = useState('')
-  const [newUrl, setNewUrl] = useState('')
+  const { reset: resetTitle, ...title } = useField('text')
+  const { reset: resetAuthor, ...author } = useField('text')
+  const { reset: resetUrl, ...url } = useField('text')
 
   const addBlog = async (event) => {
     event.preventDefault()
     await createBlog({
-      title: newTitle,
-      author: newAuthor,
-      url: newUrl,
-      likes: 0,
+      title: title.value,
+      author: author.value,
+      url: url.value,
     })
 
-    setNewTitle('')
-    setNewAuthor('')
-    setNewUrl('')
+    resetTitle()
+    resetAuthor()
+    resetUrl()
   }
 
   return (
@@ -29,10 +29,8 @@ const BlogForm = ({ createBlog }) => {
           title:
           <input
             id="title"
-            type="text"
-            value={newTitle}
-            name="Title"
-            onChange={({ target }) => setNewTitle(target.value)}
+            name="title"
+            {...title}
             placeholder="write blog title here"
           />
         </div>
@@ -40,10 +38,8 @@ const BlogForm = ({ createBlog }) => {
           author:
           <input
             id="author"
-            type="text"
-            value={newAuthor}
-            name="Author"
-            onChange={({ target }) => setNewAuthor(target.value)}
+            name="author"
+            {...author}
             placeholder="write blog author here"
           />
         </div>
@@ -51,10 +47,8 @@ const BlogForm = ({ createBlog }) => {
           url:
           <input
             id="url"
-            type="text"
-            value={newUrl}
-            name="Url"
-            onChange={({ target }) => setNewUrl(target.value)}
+            name="url"
+            {...url}
             placeholder="write blog url here"
           />
         </div>
