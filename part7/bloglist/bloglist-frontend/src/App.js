@@ -9,11 +9,15 @@ import Toggleable from './components/Toggleable'
 import blogService from './services/blogs'
 import loginService from './services/login'
 import storageService from './services/storage'
+import { useNotify } from './NotificationContext'
 
 const App = () => {
   const [blogs, setBlogs] = useState([])
-  const [info, setInfo] = useState({ message: null })
   const [user, setUser] = useState(null)
+
+  const notifyWith = useNotify()
+
+  const blogFormRef = useRef()
 
   useEffect(() => {
     blogService.getAll().then((blogs) => setBlogs(blogs))
@@ -23,19 +27,6 @@ const App = () => {
     const user = storageService.loadUser()
     setUser(user)
   }, [])
-
-  const blogFormRef = useRef()
-
-  const notifyWith = (message, type = 'info') => {
-    setInfo({
-      message,
-      type,
-    })
-
-    setTimeout(() => {
-      setInfo({ message: null })
-    }, 3000)
-  }
 
   const handleLogin = async (username, password) => {
     try {
@@ -52,7 +43,7 @@ const App = () => {
     }
   }
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
     storageService.removeUser()
     setUser(null)
     notifyWith('logged out')
@@ -102,7 +93,7 @@ const App = () => {
     return (
       <div>
         <h2>log in to application</h2>
-        <Notification info={info} />
+        <Notification />
         <LoginForm createLogin={handleLogin} />
       </div>
     )
@@ -113,7 +104,7 @@ const App = () => {
   return (
     <div>
       <h2>blogs</h2>
-      <Notification info={info} />
+      <Notification />
       <p>
         {user.name} logged in<button onClick={handleLogout}>logout</button>
       </p>
