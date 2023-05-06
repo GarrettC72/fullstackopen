@@ -40,20 +40,11 @@ export const createBlog = (blog) => {
       const newBlog = await blogService.create(blog)
       dispatch(appendBlog(newBlog))
       dispatch(
-        setNotification(
-          { message: `a new blog ${blog.title} by ${blog.author} added` },
-          3
-        )
+        setNotification(`a new blog ${blog.title} by ${blog.author} added`)
       )
     } catch (exception) {
       dispatch(
-        setNotification(
-          {
-            message: 'failed to add blog - title or url is missing',
-            type: 'error',
-          },
-          3
-        )
+        setNotification('failed to add blog - title or url is missing', 'error')
       )
     }
   }
@@ -70,19 +61,13 @@ export const likeBlog = (blog) => {
       const updatedBlog = await blogService.update(blogToUpdate)
       dispatch(updateBlog(updatedBlog))
       dispatch(
-        setNotification(
-          { message: `blog ${blog.title} by ${blog.author} was liked` },
-          3
-        )
+        setNotification(`blog ${blog.title} by ${blog.author} was liked`)
       )
     } catch (exception) {
       dispatch(
         setNotification(
-          {
-            message: `blog ${blog.title} by ${blog.author} has already been removed`,
-            type: 'error',
-          },
-          3
+          `blog ${blog.title} by ${blog.author} has already been removed`,
+          'error'
         )
       )
       dispatch(deleteBlog(blog))
@@ -95,22 +80,12 @@ export const removeBlog = (blog) => {
     try {
       await blogService.deleteObject(blog.id)
       dispatch(deleteBlog(blog))
-      dispatch(
-        setNotification(
-          { message: `Removed ${blog.title} by ${blog.author}` },
-          3
-        )
-      )
+      dispatch(setNotification(`Removed ${blog.title} by ${blog.author}`))
     } catch (exception) {
       if (exception.response.status === 404) {
         dispatch(deleteBlog(blog))
       }
-      dispatch(
-        setNotification(
-          { message: exception.response.data.error, type: 'error' },
-          3
-        )
-      )
+      dispatch(setNotification(exception.response.data.error, 'error'))
     }
   }
 }

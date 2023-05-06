@@ -29,14 +29,9 @@ export const loginUser = (username, password) => {
 
       storageService.saveUser(user)
       dispatch(setUser(user))
-      dispatch(setNotification({ message: `Logged in as ${user.name}` }, 3))
+      dispatch(setNotification(`Logged in as ${user.name}`))
     } catch (exception) {
-      dispatch(
-        setNotification(
-          { message: 'wrong username or password', type: 'error' },
-          3
-        )
-      )
+      dispatch(setNotification('wrong username or password', 'error'))
     }
   }
 }
@@ -45,7 +40,7 @@ export const logoutUser = () => {
   return async (dispatch) => {
     storageService.removeUser()
     dispatch(clearUser())
-    dispatch(setNotification({ message: 'logged out' }, 3))
+    dispatch(setNotification('logged out'))
   }
 }
 
