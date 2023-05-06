@@ -59,7 +59,7 @@ Blog.propTypes = {
       name: PropTypes.string,
     }),
   }),
-  canRemove: PropTypes.bool.isRequired,
+  canRemove: PropTypes.bool,
 }
 
 export default Blog

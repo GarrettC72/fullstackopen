@@ -1,25 +1,31 @@
-import { useState } from 'react'
 import PropTypes from 'prop-types'
 import { useDispatch } from 'react-redux'
 
 import { createBlog } from '../reducers/blogReducer'
+import { useField } from '../hooks'
 
 const BlogForm = ({ hideBlogForm }) => {
-  const [title, setTitle] = useState('')
-  const [author, setAuthor] = useState('')
-  const [url, setUrl] = useState('')
+  const { reset: resetTitle, ...title } = useField('text')
+  const { reset: resetAuthor, ...author } = useField('text')
+  const { reset: resetUrl, ...url } = useField('text')
 
   const dispatch = useDispatch()
 
   const addBlog = (event) => {
     event.preventDefault()
 
-    dispatch(createBlog({ title, author, url }))
+    dispatch(
+      createBlog({
+        title: title.value,
+        author: author.value,
+        url: url.value,
+      })
+    )
     hideBlogForm()
 
-    setTitle('')
-    setAuthor('')
-    setUrl('')
+    resetTitle()
+    resetAuthor()
+    resetUrl()
   }
 
   return (
@@ -31,10 +37,8 @@ const BlogForm = ({ hideBlogForm }) => {
           title:
           <input
             id="title"
-            type="text"
-            value={title}
             name="title"
-            onChange={({ target }) => setTitle(target.value)}
+            {...title}
             placeholder="write blog title here"
           />
         </div>
@@ -42,10 +46,8 @@ const BlogForm = ({ hideBlogForm }) => {
           author:
           <input
             id="author"
-            type="text"
-            value={author}
             name="author"
-            onChange={({ target }) => setAuthor(target.value)}
+            {...author}
             placeholder="write blog author here"
           />
         </div>
@@ -53,10 +55,8 @@ const BlogForm = ({ hideBlogForm }) => {
           url:
           <input
             id="url"
-            type="text"
-            value={url}
             name="url"
-            onChange={({ target }) => setUrl(target.value)}
+            {...url}
             placeholder="write blog url here"
           />
         </div>
