@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react'
+import { useQuery } from 'react-query'
 
 import Blog from './components/Blog'
 import Notification from './components/Notification'
@@ -9,11 +10,17 @@ import Toggleable from './components/Toggleable'
 import blogService from './services/blogs'
 import loginService from './services/login'
 import storageService from './services/storage'
+
 import { useNotify } from './NotificationContext'
 
 const App = () => {
   const [blogs, setBlogs] = useState([])
   const [user, setUser] = useState(null)
+
+  const result = useQuery('blogs', blogService.getAll, {
+    retry: 1,
+    refetchOnWindowFocus: false,
+  })
 
   const notifyWith = useNotify()
 
@@ -49,18 +56,6 @@ const App = () => {
     notifyWith('logged out')
   }
 
-  const addBlog = async (blogObject) => {
-    try {
-      const returnedBlog = await blogService.create(blogObject)
-
-      setBlogs(blogs.concat(returnedBlog))
-      notifyWith(`a new blog ${blogObject.title} by ${blogObject.author} added`)
-      blogFormRef.current.toggleVisibility()
-    } catch (exception) {
-      notifyWith('failed to add blog - title or url is missing', 'error')
-    }
-  }
-
   const likeBlog = async (blog) => {
     try {
       const blogUpdate = { ...blog, likes: blog.likes + 1, user: blog.user.id }
@@ -89,6 +84,16 @@ const App = () => {
     }
   }
 
+  if (result.isLoading) {
+    return <div>loading data...</div>
+  }
+
+  if (result.isError) {
+    return <div>blog service not available due to problems in server</div>
+  }
+
+  const sortedBlogs = result.data.sort((a, b) => b.likes - a.likes)
+
   if (user === null) {
     return (
       <div>
@@ -99,8 +104,6 @@ const App = () => {
     )
   }
 
-  const sortedBlogs = blogs.sort((a, b) => b.likes - a.likes)
-
   return (
     <div>
       <h2>blogs</h2>
@@ -109,7 +112,7 @@ const App = () => {
         {user.name} logged in<button onClick={handleLogout}>logout</button>
       </p>
       <Toggleable buttonLabel="create new blog" ref={blogFormRef}>
-        <BlogForm createBlog={addBlog} />
+        <BlogForm hideBlogForm={() => blogFormRef.current.toggleVisibility()} />
       </Toggleable>
       {sortedBlogs.map((blog) => (
         <Blog

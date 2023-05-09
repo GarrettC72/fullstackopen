@@ -1,19 +1,37 @@
 import PropTypes from 'prop-types'
+import { useMutation, useQueryClient } from 'react-query'
 
 import { useField } from '../hooks'
+import { useNotify } from '../NotificationContext'
+import blogService from '../services/blogs'
 
-const BlogForm = ({ createBlog }) => {
+const BlogForm = ({ hideBlogForm }) => {
   const { reset: resetTitle, ...title } = useField('text')
   const { reset: resetAuthor, ...author } = useField('text')
   const { reset: resetUrl, ...url } = useField('text')
 
-  const addBlog = async (event) => {
+  const queryClient = useQueryClient()
+  const notifyWith = useNotify()
+
+  const blogMutation = useMutation(blogService.create, {
+    onSuccess: (newBlog) => {
+      const blogs = queryClient.getQueryData('blogs')
+      queryClient.setQueryData('blogs', blogs.concat(newBlog))
+      notifyWith(`a new blog ${newBlog.title} by ${newBlog.author} added`)
+    },
+    onError: () => {
+      notifyWith('failed to add blog - title or url is missing', 'error')
+    },
+  })
+
+  const addBlog = (event) => {
     event.preventDefault()
-    await createBlog({
+    blogMutation.mutate({
       title: title.value,
       author: author.value,
       url: url.value,
     })
+    hideBlogForm()
 
     resetTitle()
     resetAuthor()
@@ -61,7 +79,7 @@ const BlogForm = ({ createBlog }) => {
 }
 
 BlogForm.propTypes = {
-  createBlog: PropTypes.func.isRequired,
+  hideBlogForm: PropTypes.func.isRequired,
 }
 
 export default BlogForm
