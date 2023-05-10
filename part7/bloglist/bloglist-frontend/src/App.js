@@ -1,5 +1,7 @@
 import { useState, useEffect, useRef } from 'react'
-import { useQuery } from 'react-query'
+import { useMutation, useQuery, useQueryClient } from 'react-query'
+
+import { useNotify } from './NotificationContext'
 
 import Blog from './components/Blog'
 import Notification from './components/Notification'
@@ -11,10 +13,7 @@ import blogService from './services/blogs'
 import loginService from './services/login'
 import storageService from './services/storage'
 
-import { useNotify } from './NotificationContext'
-
 const App = () => {
-  const [blogs, setBlogs] = useState([])
   const [user, setUser] = useState(null)
 
   const result = useQuery('blogs', blogService.getAll, {
@@ -22,13 +21,10 @@ const App = () => {
     refetchOnWindowFocus: false,
   })
 
+  const queryClient = useQueryClient()
   const notifyWith = useNotify()
 
   const blogFormRef = useRef()
-
-  useEffect(() => {
-    blogService.getAll().then((blogs) => setBlogs(blogs))
-  }, [])
 
   useEffect(() => {
     const user = storageService.loadUser()
@@ -56,31 +52,42 @@ const App = () => {
     notifyWith('logged out')
   }
 
-  const likeBlog = async (blog) => {
-    try {
-      const blogUpdate = { ...blog, likes: blog.likes + 1, user: blog.user.id }
-      const updatedBlog = await blogService.update(blogUpdate)
-
-      setBlogs(blogs.map((b) => (b.id === blog.id ? updatedBlog : b)))
-      notifyWith(`blog ${blog.title} by ${blog.author} was liked`)
-    } catch (exception) {
-      notifyWith(
-        `blog ${blog.title} by ${blog.author} has already been removed`,
-        'error'
+  const likeMutation = useMutation(blogService.update, {
+    onSuccess: (updatedBlog) => {
+      const blogs = queryClient.getQueryData('blogs')
+      queryClient.setQueryData(
+        'blogs',
+        blogs.map((b) => (b.id === updatedBlog.id ? updatedBlog : b))
       )
-    }
+      notifyWith(`blog ${updatedBlog.title} by ${updatedBlog.author} was liked`)
+    },
+    onError: (error) => {
+      queryClient.invalidateQueries('blogs')
+      notifyWith(error.response.data.error, 'error')
+    },
+  })
+
+  const handleLike = (blog) => {
+    const likedBlog = { ...blog, likes: blog.likes + 1, user: blog.user.id }
+    likeMutation.mutate(likedBlog)
   }
 
-  const deleteBlog = async (blog) => {
-    if (window.confirm(`Remove blog ${blog.title} by ${blog.author}`)) {
-      try {
-        await blogService.deleteObject(blog.id)
-
-        setBlogs(blogs.filter((b) => b.id !== blog.id))
-        notifyWith(`Removed ${blog.title} by ${blog.author}`)
-      } catch (exception) {
-        notifyWith(exception.response.data.error, 'error')
+  const deleteMutation = useMutation(blogService.deleteObject, {
+    onSuccess: () => {
+      queryClient.invalidateQueries('blogs')
+      notifyWith('Blog successfully removed')
+    },
+    onError: (error) => {
+      if (error.response.status === 404) {
+        queryClient.invalidateQueries('blogs')
       }
+      notifyWith(error.response.data.error, 'error')
+    },
+  })
+
+  const handleDelete = (blog) => {
+    if (window.confirm(`Remove blog ${blog.title} by ${blog.author}`)) {
+      deleteMutation.mutate(blog.id)
     }
   }
 
@@ -92,7 +99,7 @@ const App = () => {
     return <div>blog service not available due to problems in server</div>
   }
 
-  const sortedBlogs = result.data.sort((a, b) => b.likes - a.likes)
+  const blogs = result.data.sort((a, b) => b.likes - a.likes)
 
   if (user === null) {
     return (
@@ -114,11 +121,11 @@ const App = () => {
       <Toggleable buttonLabel="create new blog" ref={blogFormRef}>
         <BlogForm hideBlogForm={() => blogFormRef.current.toggleVisibility()} />
       </Toggleable>
-      {sortedBlogs.map((blog) => (
+      {blogs.map((blog) => (
         <Blog
           key={blog.id}
-          likeBlog={() => likeBlog(blog)}
-          deleteBlog={() => deleteBlog(blog)}
+          likeBlog={() => handleLike(blog)}
+          deleteBlog={() => handleDelete(blog)}
           blog={blog}
           canRemove={user && blog.user.username === user.username}
         />
