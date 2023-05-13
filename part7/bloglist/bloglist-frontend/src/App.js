@@ -1,7 +1,8 @@
-import { useState, useEffect, useRef } from 'react'
+import { useEffect, useRef } from 'react'
 import { useMutation, useQuery, useQueryClient } from 'react-query'
 
 import { useNotify } from './NotificationContext'
+import { useLogout, useUserInitialize, useUserValue } from './UserContext'
 
 import Blog from './components/Blog'
 import Notification from './components/Notification'
@@ -10,47 +11,24 @@ import BlogForm from './components/BlogForm'
 import Toggleable from './components/Toggleable'
 
 import blogService from './services/blogs'
-import loginService from './services/login'
-import storageService from './services/storage'
 
 const App = () => {
-  const [user, setUser] = useState(null)
-
   const result = useQuery('blogs', blogService.getAll, {
     retry: 1,
     refetchOnWindowFocus: false,
   })
+  const user = useUserValue()
 
   const queryClient = useQueryClient()
   const notifyWith = useNotify()
+  const initializeUser = useUserInitialize()
+  const logoutUser = useLogout()
 
   const blogFormRef = useRef()
 
   useEffect(() => {
-    const user = storageService.loadUser()
-    setUser(user)
+    initializeUser()
   }, [])
-
-  const handleLogin = async (username, password) => {
-    try {
-      const user = await loginService.login({
-        username,
-        password,
-      })
-
-      storageService.saveUser(user)
-      setUser(user)
-      notifyWith(`Logged in as ${user.name}`)
-    } catch (exception) {
-      notifyWith('wrong username or password', 'error')
-    }
-  }
-
-  const handleLogout = async () => {
-    storageService.removeUser()
-    setUser(null)
-    notifyWith('logged out')
-  }
 
   const likeMutation = useMutation(blogService.update, {
     onSuccess: (updatedBlog) => {
@@ -106,7 +84,7 @@ const App = () => {
       <div>
         <h2>log in to application</h2>
         <Notification />
-        <LoginForm createLogin={handleLogin} />
+        <LoginForm />
       </div>
     )
   }
@@ -116,7 +94,7 @@ const App = () => {
       <h2>blogs</h2>
       <Notification />
       <p>
-        {user.name} logged in<button onClick={handleLogout}>logout</button>
+        {user.name} logged in<button onClick={logoutUser}>logout</button>
       </p>
       <Toggleable buttonLabel="create new blog" ref={blogFormRef}>
         <BlogForm hideBlogForm={() => blogFormRef.current.toggleVisibility()} />

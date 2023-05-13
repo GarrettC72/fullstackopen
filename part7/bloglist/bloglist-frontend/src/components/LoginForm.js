@@ -1,14 +1,15 @@
-import PropTypes from 'prop-types'
-
 import { useField } from '../hooks'
+import { useLogin } from '../UserContext'
 
-const LoginForm = ({ createLogin }) => {
+const LoginForm = () => {
   const { reset: resetUsername, ...username } = useField('text')
   const { reset: resetPassword, ...password } = useField('password')
 
+  const loginUser = useLogin()
+
   const handleLogin = async (event) => {
     event.preventDefault()
-    await createLogin(username.value, password.value)
+    await loginUser(username.value, password.value)
 
     resetUsername()
     resetPassword()
@@ -29,10 +30,6 @@ const LoginForm = ({ createLogin }) => {
       </button>
     </form>
   )
-}
-
-LoginForm.propTypes = {
-  createLogin: PropTypes.func.isRequired,
 }
 
 export default LoginForm
