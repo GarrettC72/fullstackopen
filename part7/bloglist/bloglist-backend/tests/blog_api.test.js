@@ -256,8 +256,13 @@ describe('when there is initially some blogs saved', () => {
         .set('Authorization', `Bearer ${user.token}`)
         .expect(204)
 
-      const notesAtEnd = await helper.blogsInDb()
-      expect(notesAtEnd).toHaveLength(helper.initialBlogs.length - 1)
+      const blogsAtEnd = await helper.blogsInDb()
+      expect(blogsAtEnd).toHaveLength(helper.initialBlogs.length - 1)
+
+      // const usersResponse = await api.get('/api/users').expect(200)
+      // const users = usersResponse.body
+      // console.log(users)
+      // expect(users[0].blogs).toHaveLength(helper.initialBlogs.length - 1)
     })
 
     test('with a nonexistant id to fail with status code 404 and have no effect', async () => {
@@ -278,8 +283,8 @@ describe('when there is initially some blogs saved', () => {
 
       expect(result.body.error).toContain('blog not in database')
 
-      const notesAtEnd = await helper.blogsInDb()
-      expect(notesAtEnd).toHaveLength(helper.initialBlogs.length)
+      const blogsAtEnd = await helper.blogsInDb()
+      expect(blogsAtEnd).toHaveLength(helper.initialBlogs.length)
     })
 
     test('fails with status code 400 if id is invalid', async () => {
@@ -300,8 +305,8 @@ describe('when there is initially some blogs saved', () => {
 
       expect(result.body.error).toContain('malformatted id')
 
-      const notesAtEnd = await helper.blogsInDb()
-      expect(notesAtEnd).toHaveLength(helper.initialBlogs.length)
+      const blogsAtEnd = await helper.blogsInDb()
+      expect(blogsAtEnd).toHaveLength(helper.initialBlogs.length)
     })
 
     test('fails with status code 401 if token is not provided', async () => {
@@ -314,8 +319,8 @@ describe('when there is initially some blogs saved', () => {
 
       expect(result.body.error).toContain('operation not permitted')
 
-      const notesAtEnd = await helper.blogsInDb()
-      expect(notesAtEnd).toHaveLength(helper.initialBlogs.length)
+      const blogsAtEnd = await helper.blogsInDb()
+      expect(blogsAtEnd).toHaveLength(helper.initialBlogs.length)
     })
 
     test('fails with status code 401 if user did not create blog', async () => {
@@ -357,8 +362,8 @@ describe('when there is initially some blogs saved', () => {
 
       expect(result.body.error).toContain('operation not permitted')
 
-      const notesAtEnd = await helper.blogsInDb()
-      expect(notesAtEnd).toHaveLength(helper.initialBlogs.length)
+      const blogsAtEnd = await helper.blogsInDb()
+      expect(blogsAtEnd).toHaveLength(helper.initialBlogs.length)
     })
   })
 
