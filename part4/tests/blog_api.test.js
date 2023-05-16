@@ -260,8 +260,8 @@ describe('when there is initially some blogs saved', () => {
         .set('Authorization', `Bearer ${user.token}`)
         .expect(204)
 
-      const notesAtEnd = await helper.blogsInDb()
-      expect(notesAtEnd).toHaveLength(
+      const blogsAtEnd = await helper.blogsInDb()
+      expect(blogsAtEnd).toHaveLength(
         helper.initialBlogs.length - 1
       )
     })
@@ -284,8 +284,8 @@ describe('when there is initially some blogs saved', () => {
 
       expect(result.body.error).toContain('blog not in database')
 
-      const notesAtEnd = await helper.blogsInDb()
-      expect(notesAtEnd).toHaveLength(
+      const blogsAtEnd = await helper.blogsInDb()
+      expect(blogsAtEnd).toHaveLength(
         helper.initialBlogs.length
       )
     })
@@ -308,8 +308,8 @@ describe('when there is initially some blogs saved', () => {
 
       expect(result.body.error).toContain('malformatted id')
 
-      const notesAtEnd = await helper.blogsInDb()
-      expect(notesAtEnd).toHaveLength(
+      const blogsAtEnd = await helper.blogsInDb()
+      expect(blogsAtEnd).toHaveLength(
         helper.initialBlogs.length
       )
     })
@@ -324,8 +324,8 @@ describe('when there is initially some blogs saved', () => {
 
       expect(result.body.error).toContain('operation not permitted')
 
-      const notesAtEnd = await helper.blogsInDb()
-      expect(notesAtEnd).toHaveLength(
+      const blogsAtEnd = await helper.blogsInDb()
+      expect(blogsAtEnd).toHaveLength(
         helper.initialBlogs.length
       )
     })
@@ -369,8 +369,8 @@ describe('when there is initially some blogs saved', () => {
 
       expect(result.body.error).toContain('operation not permitted')
 
-      const notesAtEnd = await helper.blogsInDb()
-      expect(notesAtEnd).toHaveLength(
+      const blogsAtEnd = await helper.blogsInDb()
+      expect(blogsAtEnd).toHaveLength(
         helper.initialBlogs.length
       )
     })
