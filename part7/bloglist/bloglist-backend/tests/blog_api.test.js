@@ -258,11 +258,6 @@ describe('when there is initially some blogs saved', () => {
 
       const blogsAtEnd = await helper.blogsInDb()
       expect(blogsAtEnd).toHaveLength(helper.initialBlogs.length - 1)
-
-      // const usersResponse = await api.get('/api/users').expect(200)
-      // const users = usersResponse.body
-      // console.log(users)
-      // expect(users[0].blogs).toHaveLength(helper.initialBlogs.length - 1)
     })
 
     test('with a nonexistant id to fail with status code 404 and have no effect', async () => {
