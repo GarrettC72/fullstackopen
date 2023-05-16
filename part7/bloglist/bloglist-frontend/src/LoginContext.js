@@ -15,25 +15,25 @@ const reducer = (state, action) => {
   }
 }
 
-const UserContext = createContext()
+const LoginContext = createContext()
 
-export const UserContextProvider = (props) => {
+export const LoginContextProvider = (props) => {
   const [user, dispatch] = useReducer(reducer, null)
 
   return (
-    <UserContext.Provider value={[user, dispatch]}>
+    <LoginContext.Provider value={[user, dispatch]}>
       {props.children}
-    </UserContext.Provider>
+    </LoginContext.Provider>
   )
 }
 
 export const useUserValue = () => {
-  const [user] = useContext(UserContext)
+  const [user] = useContext(LoginContext)
   return user
 }
 
 export const useUserInitialize = () => {
-  const userAndDispatch = useContext(UserContext)
+  const userAndDispatch = useContext(LoginContext)
   const dispatch = userAndDispatch[1]
   return () => {
     const user = storageService.loadUser()
@@ -42,7 +42,7 @@ export const useUserInitialize = () => {
 }
 
 export const useLogin = () => {
-  const userAndDispatch = useContext(UserContext)
+  const userAndDispatch = useContext(LoginContext)
   const dispatch = userAndDispatch[1]
   const notifyWith = useNotify()
   return async (username, password) => {
@@ -59,7 +59,7 @@ export const useLogin = () => {
 }
 
 export const useLogout = () => {
-  const userAndDispatch = useContext(UserContext)
+  const userAndDispatch = useContext(LoginContext)
   const dispatch = userAndDispatch[1]
   const notifyWith = useNotify()
   return () => {
@@ -69,4 +69,4 @@ export const useLogout = () => {
   }
 }
 
-export default UserContext
+export default LoginContext

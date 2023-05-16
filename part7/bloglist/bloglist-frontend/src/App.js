@@ -2,7 +2,7 @@ import { useEffect, useRef } from 'react'
 import { useMutation, useQuery, useQueryClient } from 'react-query'
 
 import { useNotify } from './NotificationContext'
-import { useLogout, useUserInitialize, useUserValue } from './UserContext'
+import { useLogout, useUserInitialize, useUserValue } from './LoginContext'
 
 import Blog from './components/Blog'
 import Notification from './components/Notification'
