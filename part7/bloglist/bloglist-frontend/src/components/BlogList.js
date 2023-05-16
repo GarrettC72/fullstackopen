@@ -7,7 +7,7 @@ const BlogList = () => {
   const blogs = useSelector(({ blogs }) => {
     return blogs.slice().sort((a, b) => b.likes - a.likes)
   })
-  const user = useSelector((state) => state.user)
+  const user = useSelector((state) => state.login)
 
   const dispatch = useDispatch()
 

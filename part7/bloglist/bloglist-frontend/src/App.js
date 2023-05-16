@@ -1,18 +1,17 @@
 import { useEffect, useRef } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
+
 import Notification from './components/Notification'
 import LoginForm from './components/LoginForm'
 import BlogForm from './components/BlogForm'
 import Toggleable from './components/Toggleable'
 import BlogList from './components/BlogList'
 
-import storageService from './services/storage'
-
 import { initializeBlogs } from './reducers/blogReducer'
-import { logoutUser, setUser } from './reducers/userReducer'
+import { initializeLogin, logoutUser } from './reducers/loginReducer'
 
 const App = () => {
-  const user = useSelector((state) => state.user)
+  const user = useSelector((state) => state.login)
 
   const dispatch = useDispatch()
 
@@ -23,8 +22,7 @@ const App = () => {
   }, [])
 
   useEffect(() => {
-    const user = storageService.loadUser()
-    dispatch(setUser(user))
+    dispatch(initializeLogin())
   }, [])
 
   if (user === null) {

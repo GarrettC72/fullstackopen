@@ -1,23 +1,30 @@
 import { createSlice } from '@reduxjs/toolkit'
 
+import { setNotification } from './notificationReducer'
 import loginService from '../services/login'
 import storageService from '../services/storage'
-import { setNotification } from './notificationReducer'
 
-const userSlice = createSlice({
-  name: 'user',
+const loginSlice = createSlice({
+  name: 'login',
   initialState: null,
   reducers: {
-    setUser(state, action) {
+    setLogin(state, action) {
       return action.payload
     },
-    clearUser() {
+    clearLogin() {
       return null
     },
   },
 })
 
-export const { setUser, clearUser } = userSlice.actions
+export const { setLogin, clearLogin } = loginSlice.actions
+
+export const initializeLogin = () => {
+  return async (dispatch) => {
+    const user = storageService.loadUser()
+    dispatch(setLogin(user))
+  }
+}
 
 export const loginUser = (username, password) => {
   return async (dispatch) => {
@@ -28,7 +35,7 @@ export const loginUser = (username, password) => {
       })
 
       storageService.saveUser(user)
-      dispatch(setUser(user))
+      dispatch(setLogin(user))
       dispatch(setNotification(`Logged in as ${user.name}`))
     } catch (exception) {
       dispatch(setNotification('wrong username or password', 'error'))
@@ -39,9 +46,9 @@ export const loginUser = (username, password) => {
 export const logoutUser = () => {
   return async (dispatch) => {
     storageService.removeUser()
-    dispatch(clearUser())
+    dispatch(clearLogin())
     dispatch(setNotification('logged out'))
   }
 }
 
-export default userSlice.reducer
+export default loginSlice.reducer

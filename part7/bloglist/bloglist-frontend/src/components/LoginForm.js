@@ -1,6 +1,7 @@
-import { useField } from '../hooks'
 import { useDispatch } from 'react-redux'
-import { loginUser } from '../reducers/userReducer'
+
+import { useField } from '../hooks'
+import { loginUser } from '../reducers/loginReducer'
 
 const LoginForm = () => {
   const { reset: resetUsername, ...username } = useField('text')
