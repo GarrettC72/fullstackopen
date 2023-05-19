@@ -1,65 +1,51 @@
-import { useState } from 'react'
-import PropTypes from 'prop-types'
+import { useDispatch, useSelector } from 'react-redux'
+import { useNavigate, useParams } from 'react-router-dom'
 
-const Blog = ({ likeBlog, deleteBlog, blog, canRemove }) => {
-  const [fullView, setFullView] = useState(false)
+import { likeBlog, removeBlog } from '../reducers/blogReducer'
 
-  const blogStyle = {
-    paddingTop: 10,
-    paddingLeft: 2,
-    border: 'solid',
-    borderWidth: 1,
-    marginBottom: 5,
-  }
+const Blog = () => {
+  const id = useParams().id
+  const blog = useSelector(({ blogs }) => blogs.find((blog) => blog.id === id))
+  const user = useSelector((state) => state.login)
 
-  const extraBlogDetails = () => {
-    return (
-      <div>
-        <a href={blog.url}>{blog.url}</a>
-        <div>
-          likes {blog.likes}
-          <button className="like-button" onClick={likeBlog}>
-            like
-          </button>
-        </div>
-        <div>{blog.user && blog.user.name}</div>
-        {canRemove && (
-          <button className="delete-button" onClick={deleteBlog}>
-            remove
-          </button>
-        )}
-      </div>
-    )
+  const dispatch = useDispatch()
+  const navigate = useNavigate()
+  if (!blog) return null
+
+  const canRemove = user && blog.user.username === user.username
+
+  const handleDelete = () => {
+    if (window.confirm(`Remove blog ${blog.title} by ${blog.author}`)) {
+      dispatch(removeBlog(blog))
+      navigate('/')
+    }
   }
 
   return (
-    <div className="blog" style={blogStyle}>
-      <div>
+    <div className="blog">
+      <h2>
         {blog.title} {blog.author}
-        <button onClick={() => setFullView(!fullView)}>
-          {fullView ? 'hide' : 'view'}
+      </h2>
+      <div>
+        <a href={blog.url}>{blog.url}</a>
+      </div>
+      <div>
+        {blog.likes} likes
+        <button
+          className="like-button"
+          onClick={() => dispatch(likeBlog(blog))}
+        >
+          like
         </button>
       </div>
-      {fullView && extraBlogDetails()}
+      <div>added by {blog.user.name}</div>
+      {canRemove && (
+        <button className="delete-button" onClick={handleDelete}>
+          remove
+        </button>
+      )}
     </div>
   )
-}
-
-Blog.propTypes = {
-  likeBlog: PropTypes.func.isRequired,
-  deleteBlog: PropTypes.func.isRequired,
-  blog: PropTypes.shape({
-    title: PropTypes.string,
-    author: PropTypes.string,
-    url: PropTypes.string,
-    likes: PropTypes.number,
-    user: PropTypes.shape({
-      id: PropTypes.string,
-      username: PropTypes.string,
-      name: PropTypes.string,
-    }),
-  }),
-  canRemove: PropTypes.bool,
 }
 
 export default Blog

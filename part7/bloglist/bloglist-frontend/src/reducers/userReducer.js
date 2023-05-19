@@ -6,6 +6,10 @@ const userSlice = createSlice({
   name: 'users',
   initialState: [],
   reducers: {
+    updateUser(state, action) {
+      const updatedUser = action.payload
+      return state.map((u) => (u.id === updatedUser.id ? updatedUser : u))
+    },
     setUsers(state, action) {
       return action.payload
     },

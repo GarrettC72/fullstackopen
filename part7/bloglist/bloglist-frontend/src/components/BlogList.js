@@ -1,25 +1,23 @@
 import { useRef } from 'react'
-import { useSelector, useDispatch } from 'react-redux'
+import { useSelector } from 'react-redux'
+import { Link } from 'react-router-dom'
 
-import { likeBlog, removeBlog } from '../reducers/blogReducer'
 import Toggleable from './Toggleable'
 import BlogForm from './BlogForm'
-import Blog from './Blog'
 
 const BlogList = () => {
   const blogs = useSelector(({ blogs }) => {
     return blogs.slice().sort((a, b) => b.likes - a.likes)
   })
-  const user = useSelector((state) => state.login)
-
-  const dispatch = useDispatch()
 
   const blogFormRef = useRef()
 
-  const handleDelete = (blog) => {
-    if (window.confirm(`Remove blog ${blog.title} by ${blog.author}`)) {
-      dispatch(removeBlog(blog))
-    }
+  const blogStyle = {
+    paddingTop: 10,
+    paddingLeft: 2,
+    border: 'solid',
+    borderWidth: 1,
+    marginBottom: 5,
   }
 
   return (
@@ -28,13 +26,11 @@ const BlogList = () => {
         <BlogForm hideBlogForm={() => blogFormRef.current.toggleVisibility()} />
       </Toggleable>
       {blogs.map((blog) => (
-        <Blog
-          key={blog.id}
-          likeBlog={() => dispatch(likeBlog(blog))}
-          deleteBlog={() => handleDelete(blog)}
-          blog={blog}
-          canRemove={user && blog.user.username === user.username}
-        />
+        <div key={blog.id} className="blog" style={blogStyle}>
+          <Link to={`/blogs/${blog.id}`}>
+            {blog.title} {blog.author}
+          </Link>
+        </div>
       ))}
     </div>
   )
