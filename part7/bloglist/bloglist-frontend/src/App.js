@@ -10,8 +10,9 @@ import User from './components/User'
 import Blog from './components/Blog'
 
 import { initializeBlogs } from './reducers/blogReducer'
-import { initializeLogin, logoutUser } from './reducers/loginReducer'
+import { initializeLogin } from './reducers/loginReducer'
 import { initializeUsers } from './reducers/userReducer'
+import Navbar from './components/Navbar'
 
 const App = () => {
   const user = useSelector((state) => state.login)
@@ -39,12 +40,9 @@ const App = () => {
 
   return (
     <div>
-      <h2>blogs</h2>
+      <Navbar />
+      <h2>blog app</h2>
       <Notification />
-      <p>
-        {user.name} logged in
-        <button onClick={() => dispatch(logoutUser())}>logout</button>
-      </p>
       <Routes>
         <Route path="/" element={<BlogList />} />
         <Route path="/users" element={<UserList />} />
