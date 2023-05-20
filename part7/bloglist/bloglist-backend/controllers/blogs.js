@@ -29,6 +29,7 @@ blogsRouter.post('/', userExtractor, async (request, response) => {
     author,
     url,
     likes: likes ?? 0,
+    comments: [],
   })
 
   const user = request.user
@@ -50,6 +51,26 @@ blogsRouter.post('/', userExtractor, async (request, response) => {
   })
 
   response.status(201).json(createdBlog)
+})
+
+blogsRouter.post('/:id/comments', async (request, response) => {
+  const { comment } = request.body
+
+  const blog = await Blog.findById(request.params.id)
+
+  if (!blog) {
+    return response.status(404).json({ error: 'blog not in database' })
+  }
+
+  blog.comments = blog.comments.concat(comment)
+  await blog.save()
+
+  const updatedBlog = await Blog.findById(blog._id).populate('user', {
+    username: 1,
+    name: 1,
+  })
+
+  response.json(updatedBlog)
 })
 
 blogsRouter.delete('/:id', userExtractor, async (request, response) => {
@@ -75,11 +96,11 @@ blogsRouter.delete('/:id', userExtractor, async (request, response) => {
 })
 
 blogsRouter.put('/:id', async (request, response) => {
-  const { title, author, url, likes } = request.body
+  const { title, author, url, likes, comments } = request.body
 
   let updatedBlog = await Blog.findByIdAndUpdate(
     request.params.id,
-    { title, author, url, likes },
+    { title, author, url, likes, comments },
     { new: true, runValidators: true, context: 'query' }
   )
 
