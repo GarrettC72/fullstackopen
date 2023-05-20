@@ -52,6 +52,28 @@ export const createBlog = (blog) => {
   }
 }
 
+export const commentBlog = (blog, comment) => {
+  return async (dispatch) => {
+    try {
+      const updatedBlog = await blogService.comment(blog.id, comment)
+      dispatch(updateBlog(updatedBlog))
+      dispatch(
+        setNotification(
+          `new comment on blog ${blog.title} by ${blog.author}: ${comment}`
+        )
+      )
+    } catch (exception) {
+      dispatch(
+        setNotification(
+          `blog ${blog.title} by ${blog.author} has already been removed`,
+          'error'
+        )
+      )
+      dispatch(deleteBlog(blog))
+    }
+  }
+}
+
 export const likeBlog = (blog) => {
   const blogToUpdate = {
     ...blog,

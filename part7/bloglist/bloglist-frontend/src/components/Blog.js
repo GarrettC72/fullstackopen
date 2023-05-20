@@ -1,12 +1,14 @@
 import { useDispatch, useSelector } from 'react-redux'
 import { useNavigate, useParams } from 'react-router-dom'
 
-import { likeBlog, removeBlog } from '../reducers/blogReducer'
+import { commentBlog, likeBlog, removeBlog } from '../reducers/blogReducer'
+import { useField } from '../hooks'
 
 const Blog = () => {
   const id = useParams().id
   const blog = useSelector(({ blogs }) => blogs.find((blog) => blog.id === id))
   const user = useSelector((state) => state.login)
+  const { reset: resetComment, ...comment } = useField('text')
 
   const dispatch = useDispatch()
   const navigate = useNavigate()
@@ -19,6 +21,13 @@ const Blog = () => {
       dispatch(removeBlog(blog))
       navigate('/')
     }
+  }
+
+  const handleComment = (event) => {
+    event.preventDefault()
+    dispatch(commentBlog(blog, comment.value))
+
+    resetComment()
   }
 
   return (
@@ -45,6 +54,17 @@ const Blog = () => {
         </button>
       )}
       <h3>comments</h3>
+      <form onSubmit={handleComment}>
+        <input
+          id="comment"
+          name="comment"
+          {...comment}
+          placeholder="write blog comment here"
+        />
+        <button id="comment-button" type="submit">
+          add comment
+        </button>
+      </form>
       <ul>
         {blog.comments.map((comment, index) => (
           <li key={index}>{comment}</li>

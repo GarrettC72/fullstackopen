@@ -21,6 +21,19 @@ const create = async (newObject) => {
   return response.data
 }
 
+const comment = async (id, comment) => {
+  const config = {
+    headers: getHeaders(),
+  }
+
+  const response = await axios.post(
+    `${baseUrl}/${id}/comments`,
+    { comment },
+    config
+  )
+  return response.data
+}
+
 const update = async (newObject) => {
   const config = {
     headers: getHeaders(),
@@ -43,4 +56,4 @@ const deleteObject = async (id) => {
   return response.data
 }
 
-export default { getAll, create, update, deleteObject }
+export default { getAll, create, comment, update, deleteObject }

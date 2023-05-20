@@ -13,7 +13,6 @@ const BlogForm = ({ hideBlogForm }) => {
 
   const addBlog = (event) => {
     event.preventDefault()
-
     dispatch(
       createBlog({
         title: title.value,
