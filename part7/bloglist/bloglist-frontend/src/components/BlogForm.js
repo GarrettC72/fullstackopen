@@ -3,6 +3,7 @@ import { useDispatch } from 'react-redux'
 
 import { createBlog } from '../reducers/blogReducer'
 import { useField } from '../hooks'
+import { Button, TextField } from '@mui/material'
 
 const BlogForm = ({ hideBlogForm }) => {
   const { reset: resetTitle, ...title } = useField('text')
@@ -33,8 +34,8 @@ const BlogForm = ({ hideBlogForm }) => {
 
       <form onSubmit={addBlog}>
         <div>
-          title:
-          <input
+          <TextField
+            label="title"
             id="title"
             name="title"
             {...title}
@@ -42,8 +43,8 @@ const BlogForm = ({ hideBlogForm }) => {
           />
         </div>
         <div>
-          author:
-          <input
+          <TextField
+            label="author"
             id="author"
             name="author"
             {...author}
@@ -51,17 +52,22 @@ const BlogForm = ({ hideBlogForm }) => {
           />
         </div>
         <div>
-          url:
-          <input
+          <TextField
+            label="url"
             id="url"
             name="url"
             {...url}
             placeholder="write blog url here"
           />
         </div>
-        <button id="create-blog-button" type="submit">
+        <Button
+          id="create-blog-button"
+          variant="contained"
+          color="primary"
+          type="submit"
+        >
           create
-        </button>
+        </Button>
       </form>
     </div>
   )

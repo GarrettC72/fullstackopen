@@ -1,6 +1,7 @@
 import { useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { Routes, Route } from 'react-router-dom'
+import { Container } from '@mui/material'
 
 import Notification from './components/Notification'
 import LoginForm from './components/LoginForm'
@@ -39,7 +40,7 @@ const App = () => {
   }
 
   return (
-    <div>
+    <Container>
       <Navbar />
       <h2>blog app</h2>
       <Notification />
@@ -49,7 +50,7 @@ const App = () => {
         <Route path="/users/:id" element={<User />} />
         <Route path="/blogs/:id" element={<Blog />} />
       </Routes>
-    </div>
+    </Container>
   )
 }
 

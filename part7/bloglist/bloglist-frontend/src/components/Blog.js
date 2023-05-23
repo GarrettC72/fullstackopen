@@ -1,5 +1,6 @@
 import { useDispatch, useSelector } from 'react-redux'
 import { useNavigate, useParams } from 'react-router-dom'
+import { Button, TextField } from '@mui/material'
 
 import { commentBlog, likeBlog, removeBlog } from '../reducers/blogReducer'
 import { useField } from '../hooks'
@@ -55,15 +56,21 @@ const Blog = () => {
       )}
       <h3>comments</h3>
       <form onSubmit={handleComment}>
-        <input
+        <TextField
+          label="comment"
           id="comment"
           name="comment"
           {...comment}
           placeholder="write blog comment here"
         />
-        <button id="comment-button" type="submit">
+        <Button
+          id="comment-button"
+          variant="contained"
+          color="primary"
+          type="submit"
+        >
           add comment
-        </button>
+        </Button>
       </form>
       <ul>
         {blog.comments.map((comment, index) => (
