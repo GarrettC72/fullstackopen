@@ -19,10 +19,10 @@ const LoginForm = () => {
   }
 
   return (
-    <form onSubmit={handleLogin}>
+    <form id="login-form" onSubmit={handleLogin}>
       <div>
         <TextField
-          label="username"
+          label="Username"
           id="username"
           name="username"
           {...username}
@@ -30,7 +30,7 @@ const LoginForm = () => {
       </div>
       <div>
         <TextField
-          label="password"
+          label="Password"
           id="password"
           name="password"
           {...password}

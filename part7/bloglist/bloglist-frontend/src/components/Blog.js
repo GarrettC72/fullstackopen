@@ -1,6 +1,9 @@
 import { useDispatch, useSelector } from 'react-redux'
-import { useNavigate, useParams } from 'react-router-dom'
-import { Button, TextField } from '@mui/material'
+import { Link, useNavigate, useParams } from 'react-router-dom'
+import { Button, List, ListItem, ListItemText, TextField } from '@mui/material'
+import ThumbUpIcon from '@mui/icons-material/ThumbUp'
+import DeleteForeverIcon from '@mui/icons-material/DeleteForever'
+import AddCommentIcon from '@mui/icons-material/AddComment'
 
 import { commentBlog, likeBlog, removeBlog } from '../reducers/blogReducer'
 import { useField } from '../hooks'
@@ -36,47 +39,66 @@ const Blog = () => {
       <h2>
         {blog.title} {blog.author}
       </h2>
-      <div>
-        <a href={blog.url}>{blog.url}</a>
+      <div className="blog-details">
+        <div>
+          <a href={blog.url}>{blog.url}</a>
+        </div>
+        <div>
+          {blog.likes} likes
+          <Button
+            className="like-button"
+            variant="contained"
+            color="primary"
+            onClick={() => dispatch(likeBlog(blog))}
+            sx={{ marginLeft: 1 }}
+          >
+            <ThumbUpIcon sx={{ paddingRight: 1 }} />
+            like
+          </Button>
+        </div>
+        <div>
+          Added by&nbsp;
+          <Link to={`/users/${blog.user.id}`}> {blog.user.name}</Link>
+        </div>
+        {canRemove && (
+          <Button
+            className="delete-button"
+            onClick={handleDelete}
+            variant="contained"
+            color="warning"
+          >
+            <DeleteForeverIcon sx={{ paddingRight: 1 }} />
+            remove
+          </Button>
+        )}
       </div>
-      <div>
-        {blog.likes} likes
-        <button
-          className="like-button"
-          onClick={() => dispatch(likeBlog(blog))}
-        >
-          like
-        </button>
-      </div>
-      <div>added by {blog.user.name}</div>
-      {canRemove && (
-        <button className="delete-button" onClick={handleDelete}>
-          remove
-        </button>
-      )}
-      <h3>comments</h3>
-      <form onSubmit={handleComment}>
+      <form id="comment-form" onSubmit={handleComment}>
         <TextField
-          label="comment"
+          label="Comment"
           id="comment"
           name="comment"
           {...comment}
-          placeholder="write blog comment here"
+          placeholder="Write blog comment here"
         />
         <Button
           id="comment-button"
           variant="contained"
           color="primary"
           type="submit"
+          sx={{ height: 56 }}
         >
+          <AddCommentIcon sx={{ paddingRight: 1 }} />
           add comment
         </Button>
       </form>
-      <ul>
+      <h3>Comments</h3>
+      <List dense>
         {blog.comments.map((comment, index) => (
-          <li key={index}>{comment}</li>
+          <ListItem key={index} divider>
+            <ListItemText primary={comment}></ListItemText>
+          </ListItem>
         ))}
-      </ul>
+      </List>
     </div>
   )
 }

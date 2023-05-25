@@ -1,9 +1,9 @@
 import PropTypes from 'prop-types'
 import { useDispatch } from 'react-redux'
+import { Button, TextField } from '@mui/material'
 
 import { createBlog } from '../reducers/blogReducer'
 import { useField } from '../hooks'
-import { Button, TextField } from '@mui/material'
 
 const BlogForm = ({ hideBlogForm }) => {
   const { reset: resetTitle, ...title } = useField('text')
@@ -30,34 +30,34 @@ const BlogForm = ({ hideBlogForm }) => {
 
   return (
     <div className="blogForm">
-      <h2>create new</h2>
+      <h2>Create New Blog</h2>
 
-      <form onSubmit={addBlog}>
+      <form onSubmit={addBlog} id="blog-form">
         <div>
           <TextField
-            label="title"
+            label="Title"
             id="title"
             name="title"
             {...title}
-            placeholder="write blog title here"
+            placeholder="Write blog title here"
           />
         </div>
         <div>
           <TextField
-            label="author"
+            label="Author"
             id="author"
             name="author"
             {...author}
-            placeholder="write blog author here"
+            placeholder="Write blog author here"
           />
         </div>
         <div>
           <TextField
-            label="url"
+            label="Url"
             id="url"
             name="url"
             {...url}
-            placeholder="write blog url here"
+            placeholder="Write blog url here"
           />
         </div>
         <Button

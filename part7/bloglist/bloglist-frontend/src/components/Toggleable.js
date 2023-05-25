@@ -1,4 +1,5 @@
 import { useState, forwardRef, useImperativeHandle } from 'react'
+import { Button, ThemeProvider, createTheme } from '@mui/material'
 import PropTypes from 'prop-types'
 
 const Toggleable = forwardRef((props, refs) => {
@@ -17,14 +18,33 @@ const Toggleable = forwardRef((props, refs) => {
     }
   })
 
+  const theme = createTheme({
+    palette: {
+      neutral: {
+        main: '#64748B',
+        contrastText: '#fff',
+      },
+    },
+  })
+
   return (
     <div>
       <div style={hideWhenVisible}>
-        <button onClick={toggleVisibility}>{props.buttonLabel}</button>
+        <Button variant="contained" color="primary" onClick={toggleVisibility}>
+          {props.buttonLabel}
+        </Button>
       </div>
       <div style={showWhenVisible}>
         {props.children}
-        <button onClick={toggleVisibility}>cancel</button>
+        <ThemeProvider theme={theme}>
+          <Button
+            variant="contained"
+            color="neutral"
+            onClick={toggleVisibility}
+          >
+            cancel
+          </Button>
+        </ThemeProvider>
       </div>
     </div>
   )

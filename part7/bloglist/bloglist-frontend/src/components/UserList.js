@@ -10,6 +10,8 @@ import {
 import { useSelector } from 'react-redux'
 import { Link } from 'react-router-dom'
 
+import StyledTableRow from './StyledTableRow'
+
 const UserList = () => {
   const users = useSelector((state) => state.users)
 
@@ -18,20 +20,20 @@ const UserList = () => {
       <h2>Users</h2>
       <TableContainer component={Paper}>
         <Table>
-          <TableHead>
+          <TableHead sx={{ background: 'lightgrey' }}>
             <TableRow>
-              <TableCell></TableCell>
-              <TableCell>blogs created</TableCell>
+              <TableCell>User</TableCell>
+              <TableCell>Blogs Created</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
             {users.map((user) => (
-              <TableRow key={user.id}>
+              <StyledTableRow key={user.id}>
                 <TableCell>
                   <Link to={`/users/${user.id}`}>{user.name}</Link>
                 </TableCell>
                 <TableCell>{user.blogs.length}</TableCell>
-              </TableRow>
+              </StyledTableRow>
             ))}
           </TableBody>
         </Table>

@@ -9,11 +9,11 @@ import BlogList from './components/BlogList'
 import UserList from './components/UserList'
 import User from './components/User'
 import Blog from './components/Blog'
+import Navbar from './components/Navbar'
 
 import { initializeBlogs } from './reducers/blogReducer'
 import { initializeLogin } from './reducers/loginReducer'
 import { initializeUsers } from './reducers/userReducer'
-import Navbar from './components/Navbar'
 
 const App = () => {
   const user = useSelector((state) => state.login)
@@ -31,18 +31,18 @@ const App = () => {
 
   if (user === null) {
     return (
-      <div>
-        <h2>log in to application</h2>
+      <Container maxWidth="xl">
+        <h2 className="login-heading">Log in to application</h2>
         <Notification />
         <LoginForm />
-      </div>
+      </Container>
     )
   }
 
   return (
-    <Container>
+    <Container maxWidth="xl">
       <Navbar />
-      <h2>blog app</h2>
+      <h1>Blog App</h1>
       <Notification />
       <Routes>
         <Route path="/" element={<BlogList />} />

@@ -7,11 +7,11 @@ import {
   TableBody,
   TableCell,
   TableContainer,
-  TableRow,
 } from '@mui/material'
 
 import Toggleable from './Toggleable'
 import BlogForm from './BlogForm'
+import StyledTableRow from './StyledTableRow'
 
 const BlogList = () => {
   const blogs = useSelector(({ blogs }) => {
@@ -25,18 +25,19 @@ const BlogList = () => {
       <Toggleable buttonLabel="create new blog" ref={blogFormRef}>
         <BlogForm hideBlogForm={() => blogFormRef.current.toggleVisibility()} />
       </Toggleable>
+      <h2>Blogs</h2>
       <TableContainer component={Paper}>
         <Table>
           <TableBody>
             {blogs.map((blog) => (
-              <TableRow key={blog.id}>
+              <StyledTableRow key={blog.id}>
                 <TableCell>
                   <Link to={`/blogs/${blog.id}`}>
                     {blog.title} {blog.author}
                   </Link>
                 </TableCell>
                 <TableCell>{blog.user.name}</TableCell>
-              </TableRow>
+              </StyledTableRow>
             ))}
           </TableBody>
         </Table>

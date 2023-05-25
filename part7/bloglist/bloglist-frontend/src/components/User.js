@@ -1,5 +1,7 @@
 import { useParams } from 'react-router-dom'
 import { useSelector } from 'react-redux'
+import { Link } from 'react-router-dom'
+import { List, ListItem } from '@mui/material'
 
 const User = () => {
   const id = useParams().id
@@ -9,12 +11,14 @@ const User = () => {
   return (
     <div>
       <h2>{user.name}</h2>
-      <h3>added blogs</h3>
-      <ul>
+      <h3>Added Blogs</h3>
+      <List dense>
         {user.blogs.map((blog) => (
-          <li key={blog.id}>{blog.title}</li>
+          <ListItem key={blog.id} divider>
+            <Link to={`/blogs/${blog.id}`}>{blog.title}</Link>
+          </ListItem>
         ))}
-      </ul>
+      </List>
     </div>
   )
 }
