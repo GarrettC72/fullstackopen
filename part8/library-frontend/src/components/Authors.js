@@ -1,3 +1,5 @@
+import AuthorForm from "./AuthorForm"
+
 const Authors = ({ authors, show }) => {
   if (!show) {
     return null
@@ -22,6 +24,7 @@ const Authors = ({ authors, show }) => {
           ))}
         </tbody>
       </table>
+      <AuthorForm />
     </div>
   )
 }
