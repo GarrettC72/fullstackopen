@@ -5,6 +5,8 @@ const Authors = ({ authors, show }) => {
     return null
   }
 
+  const authorNames = authors ? authors.map(a => a.name) : []
+
   return (
     <div>
       <h2>authors</h2>
@@ -24,7 +26,7 @@ const Authors = ({ authors, show }) => {
           ))}
         </tbody>
       </table>
-      <AuthorForm />
+      <AuthorForm authorNames={authorNames} />
     </div>
   )
 }
