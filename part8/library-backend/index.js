@@ -174,6 +174,22 @@ const resolvers = {
   },
   Mutation: {
     addBook: async (root, args) => {
+      if (args.title.length < 5) {
+        throw new GraphQLError('Title must have minimum length 5', {
+          extensions: {
+            code: 'BAD_USER_INPUT',
+            invalidArgs: args.title
+          }
+        })
+      }
+      if (args.author.length < 4) {
+        throw new GraphQLError('Author name must have minimum length 4', {
+          extensions: {
+            code: 'BAD_USER_INPUT',
+            invalidArgs: args.author
+          }
+        })
+      }
       const book = new Book({ ...args })
       try {
         let author = await Author.findOne({ name: args.author })
@@ -189,7 +205,7 @@ const resolvers = {
         })
         return createdBook
       } catch (error) {
-        throw new GraphQLError('Saving book failed', {
+        throw new GraphQLError(`Saving book failed - book with title ${args.title} already exists`, {
           extensions: {
             code: 'BAD_USER_INPUT',
             invalidArgs: args.title,
