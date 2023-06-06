@@ -158,16 +158,18 @@ const resolvers = {
     bookCount: async () => Book.collection.countDocuments(),
     authorCount: async () => Author.collection.countDocuments(),
     allBooks: async (root, args) => {
-      return Book.find().populate('author', {
+      const filter = args.genre ? { genres: args.genre } : {}
+      const books = await Book.find(filter).populate('author', {
         name: 1,
         born: 1
       })
+      return args.author ? books.filter(b => b.author.name === args.author) : books
     },
     allAuthors: async () => Author.find({})
   },
   Author: {
-    bookCount: (root) => {
-      return books.filter((book) => book.author === root.name).length
+    bookCount: async (root) => {
+      return Book.collection.countDocuments({ author: root._id })
     }
   },
   Mutation: {
@@ -180,7 +182,12 @@ const resolvers = {
           await author.save()
         }
         book.author = author._id
-        await book.save()
+        let createdBook = await book.save()
+        createdBook = Book.findById(createdBook._id).populate('author', {
+          name: 1,
+          born: 1
+        })
+        return createdBook
       } catch (error) {
         throw new GraphQLError('Saving book failed', {
           extensions: {
@@ -190,17 +197,15 @@ const resolvers = {
           }
         })
       }
-
-      return book
     },
-    editAuthor: (root, args) => {
-      const author = authors.find((author) => author.name === args.name)
+    editAuthor: async (root, args) => {
+      const author = await Author.findOne({ name: args.name })
       if (!author) {
         return null
       }
-      const updatedAuthor = { ...author, born: args.setBornTo }
-      authors = authors.map((author) => author.name === args.name ? updatedAuthor : author)
-      return updatedAuthor
+      author.born = args.setBornTo
+      await author.save()
+      return author
     }
   }
 }
