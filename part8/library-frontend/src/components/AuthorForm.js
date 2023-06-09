@@ -2,13 +2,18 @@ import { useMutation } from "@apollo/client"
 import { useState, useEffect } from "react"
 import Select from 'react-select'
 
-import { EDIT_BIRTH_YEAR } from "../queries"
+import { ALL_AUTHORS, EDIT_BIRTH_YEAR } from "../queries"
 
-const AuthorForm = ({ authorNames }) => {
+const AuthorForm = ({ setError, authorNames }) => {
   const [selectedAuthor, setSelectedAuthor] = useState(null)
   const [born, setBorn] = useState('')
 
-  const [ changeBirthYear ] = useMutation(EDIT_BIRTH_YEAR)
+  const [ changeBirthYear ] = useMutation(EDIT_BIRTH_YEAR, {
+    refetchQueries: [ { query: ALL_AUTHORS }],
+    onError: (error) => {
+      setError(error.graphQLErrors[0].message)
+    }
+  })
 
   const submit = async (event) => {
     event.preventDefault()

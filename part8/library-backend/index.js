@@ -198,6 +198,16 @@ const resolvers = {
   },
   Mutation: {
     addBook: async (root, args, context) => {
+      const currentUser = context.currentUser
+
+      if (!currentUser) {
+        throw new GraphQLError('not authenticated', {
+          extensions: {
+            code: 'BAD_USER_INPUT',
+          }
+        })
+      }
+      
       if (args.title.length < 5) {
         throw new GraphQLError('Title must have minimum length 5', {
           extensions: {
@@ -217,15 +227,6 @@ const resolvers = {
       }
 
       const book = new Book({ ...args })
-      const currentUser = context.currentUser
-
-      if (!currentUser) {
-        throw new GraphQLError('not authenticated', {
-          extensions: {
-            code: 'BAD_USER_INPUT',
-          }
-        })
-      }
 
       try {
         let author = await Author.findOne({ name: args.author })
