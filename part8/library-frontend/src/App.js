@@ -5,8 +5,9 @@ import Authors from './components/Authors'
 import Books from './components/Books'
 import NewBook from './components/NewBook'
 import LoginForm from './components/LoginForm'
+import Recommend from './components/Recommend'
 
-import { ALL_AUTHORS, ALL_BOOKS } from './queries'
+import { ALL_AUTHORS, ALL_BOOKS, CURRENT_USER } from './queries'
 
 const Notify = ({errorMessage}) => {
   if ( !errorMessage ) {
@@ -26,6 +27,9 @@ const App = () => {
 
   const authorsResult = useQuery(ALL_AUTHORS)
   const booksResult = useQuery(ALL_BOOKS)
+  const currentUserResult = useQuery(CURRENT_USER, {
+    skip: !token
+  })
   const client = useApolloClient()
 
   useEffect(() => {
@@ -33,7 +37,7 @@ const App = () => {
     setToken(token)
   }, [])
 
-  if (authorsResult.loading || booksResult.loading) {
+  if (authorsResult.loading || booksResult.loading || currentUserResult.loading) {
     return <div>loading...</div>
   }
 
@@ -60,6 +64,7 @@ const App = () => {
           (
             <>
               <button onClick={() => setPage('add')}>add book</button>
+              <button onClick={() => setPage('recommend')}>recommend</button>
               <button onClick={logout}>logout</button>
             </>
           ) :
@@ -82,6 +87,14 @@ const App = () => {
         setError={notify}
         show={page === 'login'}
       />
+
+      {currentUserResult.data &&
+        <Recommend
+          books={booksResult.data.allBooks.filter(book => book.genres.includes(currentUserResult.data.me.favoriteGenre))}
+          genre={currentUserResult.data.me.favoriteGenre}
+          show={page === 'recommend'}
+        />
+      }
     </div>
   )
 }
