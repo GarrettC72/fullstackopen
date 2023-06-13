@@ -38,4 +38,4 @@ This repository contains my current progress for the Full Stack open 2022 course
 
 **Part 8:** _GraphQL_
 
-- Exercises completed: 20/26
+- Exercises completed: 21/26

@@ -1,13 +1,11 @@
 import { useState, useEffect } from 'react'
-import { useApolloClient, useQuery } from '@apollo/client'
+import { useApolloClient } from '@apollo/client'
 
 import Authors from './components/Authors'
 import Books from './components/Books'
 import NewBook from './components/NewBook'
 import LoginForm from './components/LoginForm'
 import Recommend from './components/Recommend'
-
-import { ALL_AUTHORS, ALL_BOOKS, CURRENT_USER } from './queries'
 
 const Notify = ({errorMessage}) => {
   if ( !errorMessage ) {
@@ -25,21 +23,12 @@ const App = () => {
   const [errorMessage, setErrorMessage] = useState(null)
   const [token, setToken] = useState(null)
 
-  const authorsResult = useQuery(ALL_AUTHORS)
-  const booksResult = useQuery(ALL_BOOKS)
-  const currentUserResult = useQuery(CURRENT_USER, {
-    skip: !token
-  })
   const client = useApolloClient()
 
   useEffect(() => {
     const token = localStorage.getItem('library-user-token')
     setToken(token)
   }, [])
-
-  if (authorsResult.loading || booksResult.loading || currentUserResult.loading) {
-    return <div>loading...</div>
-  }
 
   const notify = (message) => {
     setErrorMessage(message)
@@ -73,12 +62,13 @@ const App = () => {
       </div>
 
       <Authors
-        authors={authorsResult.data.allAuthors}
         setError={notify}
         show={page === 'authors'}
       />
 
-      <Books books={booksResult.data.allBooks} show={page === 'books'} />
+      <Books
+        show={page === 'books'}
+      />
 
       <NewBook setError={notify} show={page === 'add'} />
 
@@ -88,13 +78,9 @@ const App = () => {
         show={page === 'login'}
       />
 
-      {currentUserResult.data &&
-        <Recommend
-          books={booksResult.data.allBooks.filter(book => book.genres.includes(currentUserResult.data.me.favoriteGenre))}
-          genre={currentUserResult.data.me.favoriteGenre}
-          show={page === 'recommend'}
-        />
-      }
+      <Recommend
+        show={page === 'recommend'}
+      />
     </div>
   )
 }
