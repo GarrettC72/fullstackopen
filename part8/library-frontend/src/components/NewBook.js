@@ -11,10 +11,32 @@ const NewBook = ({ setError, show }) => {
   const [genres, setGenres] = useState([])
 
   const [ createBook ] = useMutation(CREATE_BOOK, {
+    refetchQueries: [ { query: ALL_AUTHORS } ],
     onError: (error) => {
       setError(error.graphQLErrors[0].message)
     },
-    refetchQueries: [ { query: ALL_BOOKS }, { query: ALL_GENRES }, { query: ALL_AUTHORS } ]
+    update: (cache, response) => {
+      const { genres: bookGenres, ...newBook } = response.data.addBook
+      bookGenres.forEach(bookGenre => {
+        cache.updateQuery({ query: ALL_BOOKS, variables: { genre: bookGenre }}, (data) => {
+          if (data) {
+            return {
+              allBooks: data.allBooks.concat(newBook)
+            }
+          }
+        })
+      })
+      cache.updateQuery({ query: ALL_BOOKS, variables: { genre: null } }, ({ allBooks }) => {
+        return {
+          allBooks: allBooks.concat(newBook)
+        }
+      })
+      cache.updateQuery({ query: ALL_GENRES }, ({ allBooks }) => {
+        return {
+          allBooks: allBooks.concat({ genres: bookGenres, __typename: newBook.__typename})
+        }
+      })
+    }
   })
 
   if (!show) {
