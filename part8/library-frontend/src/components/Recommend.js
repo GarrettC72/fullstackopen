@@ -6,7 +6,7 @@ const Recommend = ({ show }) => {
   const currentUserResult = useQuery(CURRENT_USER)
   const recommendedBooksResult = useQuery(ALL_BOOKS, {
     skip: !currentUserResult.data,
-    variables: { genre: currentUserResult.data.me.favoriteGenre }
+    variables: { genre: currentUserResult.data?.me.favoriteGenre }
   })
 
   if (!show) {
