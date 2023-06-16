@@ -40,7 +40,8 @@ const App = () => {
   const logout = async () => {
     setToken(null)
     localStorage.clear()
-    client.clearStore()
+    client.resetStore()
+    setPage('login')
   }
 
   return (
@@ -75,6 +76,7 @@ const App = () => {
       <LoginForm
         setToken={setToken}
         setError={notify}
+        setPage={() => setPage('authors')}
         show={page === 'login'}
       />
 

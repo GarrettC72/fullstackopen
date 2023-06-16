@@ -1,12 +1,13 @@
-import { useMutation } from "@apollo/client"
+import { useMutation, useQuery } from "@apollo/client"
 import { useEffect, useState } from "react"
 
-import { LOGIN } from "../queries"
+import { CURRENT_USER, LOGIN } from "../queries"
 
-const LoginForm = ({ setToken, setError, show }) => {
+const LoginForm = ({ setToken, setError, setPage, show }) => {
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
 
+  const { refetch: refetchCurrentUser } = useQuery(CURRENT_USER)
   const [login, result] = useMutation(LOGIN, {
     onError: (error) => {
       setError(error.graphQLErrors[0].message)
@@ -18,6 +19,8 @@ const LoginForm = ({ setToken, setError, show }) => {
       const token = result.data.login.value
       setToken(token)
       localStorage.setItem('library-user-token', token)
+      refetchCurrentUser()
+      setPage()
     }
   }, [result.data]) // eslint-disable-line
 

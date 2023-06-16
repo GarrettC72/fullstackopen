@@ -9,9 +9,15 @@ const AuthorForm = ({ setError, authorNames }) => {
   const [born, setBorn] = useState('')
 
   const [ changeBirthYear ] = useMutation(EDIT_BIRTH_YEAR, {
-    refetchQueries: [ { query: ALL_AUTHORS } ],
     onError: (error) => {
       setError(error.graphQLErrors[0].message)
+    },
+    update: (cache, response) => {
+      cache.updateQuery({ query: ALL_AUTHORS }, ({ allAuthors }) => {
+        return {
+          allAuthors: allAuthors.map(a => a.id === response.data.editAuthor.id ? response.data.editAuthor : a)
+        }
+      })
     }
   })
 
