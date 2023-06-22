@@ -19,6 +19,7 @@ const User = require('./models/user')
 
 const typeDefs = require('./schema')
 const resolvers = require('./resolvers')
+const loaders = require('./loaders')
 
 require('dotenv').config()
 
@@ -33,6 +34,8 @@ mongoose.connect(MONGODB_URI)
   .catch((error) => {
     console.log('error connection to MongoDB:', error.message)
   })
+
+// mongoose.set('debug', true);
 
 // let authors = [
 //   {
@@ -166,7 +169,7 @@ const start = async () => {
         if (auth && auth.startsWith('Bearer ')) {
           const decodedToken = jwt.verify(auth.substring(7), process.env.JWT_SECRET)
           const currentUser = await User.findById(decodedToken.id)
-          return { currentUser }
+          return { currentUser, loaders }
         }
       },
     })

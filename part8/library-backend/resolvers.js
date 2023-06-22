@@ -25,8 +25,8 @@ const resolvers = {
     }
   },
   Author: {
-    bookCount: async (root) => {
-      return Book.collection.countDocuments({ author: root._id })
+    bookCount: async (root, args, { loaders }) => {
+      return loaders.bookCountLoader.load(root._id)
     }
   },
   Mutation: {
