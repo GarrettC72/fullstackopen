@@ -4,8 +4,8 @@ interface bmiValues {
 }
 
 const parseBmiArguments = (args: string[]): bmiValues => {
-  if (args.length < 4) throw new Error("Not enough arguments");
-  if (args.length > 4) throw new Error("Too many arguments");
+  if (args.length < 4) throw new Error('Not enough arguments');
+  if (args.length > 4) throw new Error('Too many arguments');
 
   if (!isNaN(Number(args[2])) && !isNaN(Number(args[3]))) {
     return {
@@ -13,25 +13,25 @@ const parseBmiArguments = (args: string[]): bmiValues => {
       weight: Number(args[3]),
     }
   } else {
-    throw new Error("Provided values were not numbers!");
+    throw new Error('Provided values were not numbers!');
   }
 }
 
 const calculateBmi = (height: number, weight: number): string => {
   if (height === 0) {
-    throw new Error("Height can not be zero");
+    throw new Error('Height can not be zero');
   }
 
   const bmi = weight / ((height * height) / 10000);
 
   if (bmi >= 30) {
-    return "Obese";
+    return 'Obese';
   } else if (bmi >= 25) {
-    return "Overweight";
+    return 'Overweight';
   } else if (bmi >= 18.5) {
-    return "Normal (healthy weight)";
+    return 'Normal (healthy weight)';
   } else {
-    return "Underweight";
+    return 'Underweight';
   }
 }
 

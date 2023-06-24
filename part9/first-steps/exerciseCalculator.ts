@@ -14,19 +14,19 @@ interface exerciseValues {
 }
 
 const parseExerciseArguments = (args: string[]): exerciseValues => {
-  if (args.length < 4) throw new Error("Not enough arguments");
+  if (args.length < 4) throw new Error('Not enough arguments');
 
   let target: number;
   if (!isNaN(Number(args[2]))) {
     target = Number(args[2]);
   } else {
-    throw new Error("Provided values were not numbers!");
+    throw new Error('Provided values were not numbers!');
   }
 
   let dailyExerciseHours: number[] = [];
   for (let i = 3; i < args.length; i++) {
     if (isNaN(Number(args[i]))) {
-      throw new Error("Provided values were not numbers!");
+      throw new Error('Provided values were not numbers!');
     }
     dailyExerciseHours.push(Number(args[i]));
   }
@@ -39,7 +39,7 @@ const calculateExercises = (
   target: number
 ): Result => {
   if (target === 0) {
-    throw new Error("Target amount of daily hours can not be zero");
+    throw new Error('Target amount of daily hours can not be zero');
   }
 
   const periodLength = dailyExerciseHours.length;
@@ -54,13 +54,13 @@ const calculateExercises = (
 
   if (ratio < 0.75) {
     rating = 1;
-    ratingDescription = "not enough daily exercise";
+    ratingDescription = 'not enough daily exercise';
   } else if (ratio < 1) {
     rating = 2;
-    ratingDescription = "not too bad but could be better";
+    ratingDescription = 'no too bad but could be better';
   } else {
     rating = 3;
-    ratingDescription = "target hours was reached";
+    ratingDescription = 'target hours was reached';
   }
 
   return {
