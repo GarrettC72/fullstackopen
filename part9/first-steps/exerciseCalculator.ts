@@ -24,7 +24,7 @@ const calculateExercises = (
 
   if (ratio < 0.75) {
     rating = 1;
-    ratingDescription = "";
+    ratingDescription = "not enough daily exercise";
   } else if (ratio < 1) {
     rating = 2;
     ratingDescription = "not too bad but could be better";
