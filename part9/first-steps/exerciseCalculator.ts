@@ -23,7 +23,7 @@ const parseExerciseArguments = (args: string[]): exerciseValues => {
     throw new Error('Provided values were not numbers!');
   }
 
-  let dailyExerciseHours: number[] = [];
+  const dailyExerciseHours: number[] = [];
   for (let i = 3; i < args.length; i++) {
     if (isNaN(Number(args[i]))) {
       throw new Error('Provided values were not numbers!');
@@ -31,8 +31,8 @@ const parseExerciseArguments = (args: string[]): exerciseValues => {
     dailyExerciseHours.push(Number(args[i]));
   }
 
-  return { target, dailyExerciseHours }
-}
+  return { target, dailyExerciseHours };
+};
 
 const calculateExercises = (
   dailyExerciseHours: number[],
@@ -72,7 +72,7 @@ const calculateExercises = (
     target,
     average,
   };
-}
+};
 
 try {
   const { target, dailyExerciseHours } = parseExerciseArguments(process.argv);
