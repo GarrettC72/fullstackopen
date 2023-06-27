@@ -17,7 +17,7 @@ const parseBmiArguments = (args: string[]): bmiValues => {
   }
 }
 
-const calculateBmi = (height: number, weight: number): string => {
+export const calculateBmi = (height: number, weight: number): string => {
   if (height === 0) {
     throw new Error('Height can not be zero');
   }
