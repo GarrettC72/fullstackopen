@@ -34,7 +34,7 @@ const parseExerciseArguments = (args: string[]): exerciseValues => {
   return { target, dailyExerciseHours };
 };
 
-const calculateExercises = (
+export const calculateExercises = (
   dailyExerciseHours: number[],
   target: number
 ): Result => {
@@ -54,10 +54,10 @@ const calculateExercises = (
 
   if (ratio < 0.75) {
     rating = 1;
-    ratingDescription = 'not enough daily exercise';
+    ratingDescription = 'bad';
   } else if (ratio < 1) {
     rating = 2;
-    ratingDescription = 'no too bad but could be better';
+    ratingDescription = 'not too bad but could be better';
   } else {
     rating = 3;
     ratingDescription = 'target hours was reached';
