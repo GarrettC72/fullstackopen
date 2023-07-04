@@ -1,15 +1,10 @@
-interface CoursePart {
-  name: string;
-  exerciseCount: number;
-}
+import { CoursePart } from '../types';
+
+import Part from './Part';
 
 interface ContentProps {
   parts: CoursePart[];
 }
-
-const Part = ({ part }: { part: CoursePart }) => {
-  return <p>{part.name} {part.exerciseCount}</p>;
-};
 
 const Content = (props: ContentProps) => {
   return (
