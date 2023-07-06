@@ -1,13 +1,11 @@
 import { useState, useEffect } from "react";
 
-import { DiaryEntry } from "./types";
-import { getAllDiaries } from "./diaryService";
+import { DiaryEntry, NewDiaryEntry } from "./types";
+import { createDiary, getAllDiaries } from "./diaryService";
+import DiaryForm from "./components/DiaryForm";
 
 const App = () => {
   const [diaries, setDiaries] = useState<DiaryEntry[]>([]);
-  const diaryCreation = (event: React.SyntheticEvent) => {
-    event.preventDefault();
-  }
 
   useEffect(() => {
     getAllDiaries().then(data => {
@@ -15,28 +13,16 @@ const App = () => {
     })
   }, []);
 
+  const diaryCreation = (object: NewDiaryEntry) => {
+    createDiary(object).then(data => {
+      setDiaries(diaries.concat(data));
+    });
+  }
+
   return (
     <div>
       <h3>Add new diary</h3>
-      <form onSubmit={diaryCreation}>
-        <div>
-          date
-          <input/>
-        </div>
-        <div>
-          visibility
-          <input/>
-        </div>
-        <div>
-          weather
-          <input/>
-        </div>
-        <div>
-          comment
-          <input/>
-        </div>
-        <button type="submit">add</button>
-      </form>
+      <DiaryForm diaryCreation={diaryCreation} />
       <h3>Diary entries</h3>
       {diaries.map(diary => 
         <div key={diary.id}>
