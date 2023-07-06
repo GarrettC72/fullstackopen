@@ -42,7 +42,7 @@ const App = () => {
 
   return (
     <div>
-      <h3>Add new diary</h3>
+      <h3>Add new entry</h3>
       <Notification errorMessage={errorMessage} />
       <DiaryForm diaryCreation={diaryCreation} />
       <h3>Diary entries</h3>
