@@ -1,5 +1,6 @@
 import { useParams } from "react-router-dom";
 import { useState, useEffect } from "react";
+import { Typography } from "@mui/material";
 import { Male, Female } from "@mui/icons-material";
 import axios from 'axios';
 
@@ -43,20 +44,43 @@ const PatientPage = () => {
 
   const genderIcon = (gender: Gender) => {
     switch (gender) {
-      case Gender.Male:
+      case "male":
         return <Male />;
-      case Gender.Female:
+      case "female":
         return <Female />;
-      case Gender.Other:
+      case "other":
         return;
     }
   }
 
   return (
     <div>
-      <h2>{patient.name} {genderIcon(patient.gender)}</h2>
-      <div>ssn: {patient.ssn}</div>
-      <div>occupation: {patient.occupation}</div>
+      <Typography variant="h5" style={{ fontWeight: "bold", margin: "1.25em 0 0.75em" }}>
+        {patient.name} {genderIcon(patient.gender)}
+      </Typography>
+      <Typography variant="body2">
+        ssn: {patient.ssn}<br />
+        occupation: {patient.occupation}
+      </Typography>
+      <Typography variant="h6" style={{ fontWeight: "bold", margin: "1.5em 0 0.9em" }}>
+        entries
+      </Typography>
+      {patient.entries.map(entry =>
+        <div key={entry.id}>
+          <Typography variant="body2">
+            {entry.date} <i>{entry.description}</i>
+          </Typography>
+          <ul>
+            {entry.diagnosisCodes && entry.diagnosisCodes.map(diagnosisCode =>
+              <li key={diagnosisCode}>
+                <Typography variant="body2">
+                  {diagnosisCode}
+                </Typography>
+              </li>
+            )}
+          </ul>
+        </div>
+      )}
     </div>
   );
 };
