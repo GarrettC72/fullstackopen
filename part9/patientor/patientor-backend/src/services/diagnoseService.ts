@@ -1,8 +1,8 @@
 import diagnoeses from '../../data/diagnoses';
 
-import { Diagnose } from '../types';
+import { Diagnosis } from '../types';
 
-const getDiagnoeses = (): Diagnose[] => {
+const getDiagnoeses = (): Diagnosis[] => {
   return diagnoeses;
 };
 

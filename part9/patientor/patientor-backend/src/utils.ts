@@ -1,4 +1,4 @@
-import { Gender, NewPatient } from "./types";
+import { Entry, EntryType, Gender, NewPatient } from "./types";
 
 const isString = (text: unknown): text is string => {
   return typeof text === 'string' || text instanceof String;
@@ -10,6 +10,15 @@ const isDate = (date: string): boolean => {
 
 const isGender = (param: string): param is Gender => {
   return Object.values(Gender).map(v => v.toString()).includes(param);
+};
+
+const isEntry = (param: object): param is Entry => {
+  return 'type' in param && isString(param.type) &&
+  Object.values(EntryType).map(v => v.toString()).includes(param.type);
+};
+
+const isEntries = (param: unknown[]): param is Entry[] => {
+  return param.every(parseEntry);
 };
 
 const parseName = (name: unknown): string => {
@@ -52,7 +61,23 @@ const parseOccupation = (occupation: unknown): string => {
   return occupation;
 };
 
-const toNewPatient = (object: unknown): NewPatient => {
+const parseEntry = (entry: unknown): Entry => {
+  if (!entry || typeof entry !== 'object' || !isEntry(entry)) {
+    throw new Error('Incorrect or missing entry');
+  }
+
+  return entry;
+};
+
+export const parseEntries = (entries: unknown[]): Entry[] => {
+  if (!entries || !isEntries(entries)) {
+    throw new Error('Incorrect or missing entries');
+  }
+
+  return entries;
+};
+
+export const toNewPatient = (object: unknown): NewPatient => {
   if (!object || typeof object !== 'object') {
     throw new Error('Incorrect or missing data');
   }
@@ -74,4 +99,4 @@ const toNewPatient = (object: unknown): NewPatient => {
   throw new Error('Incorrect data: some fields are missing');
 };
 
-export default toNewPatient;
+// export default toNewPatient;
