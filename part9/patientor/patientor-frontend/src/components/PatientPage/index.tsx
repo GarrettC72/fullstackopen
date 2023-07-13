@@ -4,12 +4,16 @@ import { Typography } from "@mui/material";
 import { Male, Female } from "@mui/icons-material";
 import axios from 'axios';
 
-import { Gender, Patient } from "../../types";
+import { Diagnosis, Gender, Patient } from "../../types";
 
 import patientService from "../../services/patients";
 
-const PatientPage = () => {
-  const [patient, setPatient] = useState<Patient | null>(null)
+interface Props {
+  diagnoses: Diagnosis[];
+}
+
+const PatientPage = ({ diagnoses }: Props) => {
+  const [patient, setPatient] = useState<Patient | null>(null);
   const id = useParams().id;
 
   useEffect(() => {
@@ -34,7 +38,7 @@ const PatientPage = () => {
       }
       void fetchPatientInfo(id);
     }
-  }, [id])
+  }, [id]);
 
   if (!patient) {
     return (
@@ -42,7 +46,7 @@ const PatientPage = () => {
     );
   }
 
-  const genderIcon = (gender: Gender) => {
+  const getGenderIcon = (gender: Gender) => {
     switch (gender) {
       case "male":
         return <Male />;
@@ -53,10 +57,15 @@ const PatientPage = () => {
     }
   }
 
+  const getCodeDescription = (code: Diagnosis['code']) => {
+    const diagnosis = diagnoses.find(diagnosis => diagnosis.code === code);
+    return diagnosis ? diagnosis.name : '';
+  }
+
   return (
     <div>
       <Typography variant="h5" style={{ fontWeight: "bold", margin: "1.25em 0 0.75em" }}>
-        {patient.name} {genderIcon(patient.gender)}
+        {patient.name} {getGenderIcon(patient.gender)}
       </Typography>
       <Typography variant="body2">
         ssn: {patient.ssn}<br />
@@ -70,15 +79,17 @@ const PatientPage = () => {
           <Typography variant="body2">
             {entry.date} <i>{entry.description}</i>
           </Typography>
-          <ul>
-            {entry.diagnosisCodes && entry.diagnosisCodes.map(diagnosisCode =>
-              <li key={diagnosisCode}>
-                <Typography variant="body2">
-                  {diagnosisCode}
-                </Typography>
-              </li>
-            )}
-          </ul>
+          {entry.diagnosisCodes &&
+            <ul>
+              {entry.diagnosisCodes.map(diagnosisCode =>
+                <li key={diagnosisCode}>
+                  <Typography variant="body2">
+                    {diagnosisCode} {getCodeDescription(diagnosisCode)}
+                  </Typography>
+                </li>
+              )}
+            </ul>
+          }
         </div>
       )}
     </div>
