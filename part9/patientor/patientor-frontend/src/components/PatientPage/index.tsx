@@ -1,12 +1,12 @@
 import { useParams } from "react-router-dom";
 import { useState, useEffect } from "react";
-import { Typography } from "@mui/material";
 import { Male, Female } from "@mui/icons-material";
 import axios from 'axios';
 
 import { Diagnosis, Gender, Patient } from "../../types";
 
 import patientService from "../../services/patients";
+import EntryDetails from "./EntryDetails";
 
 interface Props {
   diagnoses: Diagnosis[];
@@ -57,40 +57,24 @@ const PatientPage = ({ diagnoses }: Props) => {
     }
   }
 
-  const getCodeDescription = (code: Diagnosis['code']) => {
-    const diagnosis = diagnoses.find(diagnosis => diagnosis.code === code);
-    return diagnosis ? diagnosis.name : '';
-  }
-
   return (
     <div>
-      <Typography variant="h5" style={{ fontWeight: "bold", margin: "1.25em 0 0.75em" }}>
+      <h2>
         {patient.name} {getGenderIcon(patient.gender)}
-      </Typography>
-      <Typography variant="body2">
-        ssn: {patient.ssn}<br />
+      </h2>
+      <div>
+        ssn: {patient.ssn}
+      </div>
+      <div>
         occupation: {patient.occupation}
-      </Typography>
-      <Typography variant="h6" style={{ fontWeight: "bold", margin: "1.5em 0 0.9em" }}>
-        entries
-      </Typography>
+      </div>
+      <h3>entries</h3>
       {patient.entries.map(entry =>
-        <div key={entry.id}>
-          <Typography variant="body2">
-            {entry.date} <i>{entry.description}</i>
-          </Typography>
-          {entry.diagnosisCodes &&
-            <ul>
-              {entry.diagnosisCodes.map(diagnosisCode =>
-                <li key={diagnosisCode}>
-                  <Typography variant="body2">
-                    {diagnosisCode} {getCodeDescription(diagnosisCode)}
-                  </Typography>
-                </li>
-              )}
-            </ul>
-          }
-        </div>
+        <EntryDetails
+          key={entry.id}
+          entry={entry}
+          diagnoses={diagnoses}
+        />
       )}
     </div>
   );
