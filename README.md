@@ -42,4 +42,4 @@ This repository contains my current progress for the Full Stack open 2022 course
 
 **Part 9:** _TypeScript_
 
-- Exercises completed: 25/29
+- Exercises completed: 26/29
