@@ -30,7 +30,7 @@ const parseStringParam = (param: unknown, field: string): string => {
 
 const parseDate = (date: unknown): string => {
   if (!isString(date) || !isDate(date)) {
-    throw new Error('Incorrect dateOfBirth: ' + date);
+    throw new Error('Value of dateOfBirth incorrect: ' + date);
   }
 
   return date;
@@ -38,7 +38,7 @@ const parseDate = (date: unknown): string => {
 
 const parseGender = (gender: unknown): Gender => {
   if (!isString(gender) || !isGender(gender)) {
-    throw new Error('Incorrect gender: ' + gender);
+    throw new Error('Value of gender incorrect: ' + gender);
   }
 
   return gender;
@@ -55,7 +55,7 @@ const parseDiagnosisCodes = (object: unknown): Array<Diagnosis['code']> =>  {
 
 const parseHealthCheckRating = (healthCheckRating: unknown): HealthCheckRating => {
   if (!isNumber(healthCheckRating) || !isHealthCheckRating(healthCheckRating)) {
-    throw new Error('Incorrect healthCheckRating: ' + healthCheckRating);
+    throw new Error('Value of healthCheckRating incorrect: ' + healthCheckRating);
   }
 
   return healthCheckRating;
@@ -64,7 +64,7 @@ const parseHealthCheckRating = (healthCheckRating: unknown): HealthCheckRating =
 const parseDischarge = (discharge: unknown): Discharge => {
   if (!discharge || typeof discharge !== 'object' || !('date' in discharge)
   || !('criteria' in discharge)) {
-    throw new Error('Incorrect or missing discharge');
+    throw new Error('Incorrect or missing fields in discharge');
   }
 
   return {

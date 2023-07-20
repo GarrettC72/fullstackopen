@@ -44,11 +44,10 @@ router.post('/', (req, res) => {
 router.post('/:id/entries', (req, res) => {
   try {
     const newEntry = toNewEntry(req.body);
-    const patient = patientService.findById(req.params.id);
+    const addedEntry = patientService.addEntry(req.params.id, newEntry);
 
-    if (patient) {
-      const updatedPatient = patientService.addEntry(patient, newEntry);
-      res.json(updatedPatient);
+    if (addedEntry) {
+      res.json(addedEntry);
     } else {
       res.sendStatus(404);
     }
