@@ -1,7 +1,10 @@
-import { Box, Button, TextField } from "@mui/material";
+import { Button, FormControl, InputLabel, MenuItem, Select } from "@mui/material";
 import { forwardRef, useImperativeHandle, useState } from "react";
 
 import { EntryFormValues } from "../../types";
+import HospitalForm from "./HospitalForm";
+import OccupationalHealthcareForm from "./OccupationalHealthcareForm";
+import HealthCheckForm from "./HealthCheckForm";
 
 interface Props {
   onSubmit: (values: EntryFormValues) => void;
@@ -13,11 +16,7 @@ export type EntryFormHandle = {
 
 const AddEntryForm = forwardRef<EntryFormHandle, Props>(({ onSubmit }, refs) => {
   const [visible, setVisible] = useState(false);
-  const [description, setDescription] = useState('');
-  const [date, setDate] = useState('');
-  const [specialist, setSpecialist] = useState('');
-  const [healthCheckRating, setHealthCheckRating] = useState('');
-  const [diagnosisCodes, setDiagnosisCodes] = useState('');
+  const [entryType, setEntryType] = useState('Hospital');
 
   const hideWhenVisible = {
     marginTop: 10,
@@ -31,11 +30,6 @@ const AddEntryForm = forwardRef<EntryFormHandle, Props>(({ onSubmit }, refs) => 
     display: visible ? '' : 'none'
   };
 
-  const buttonStyle = {
-    display: 'flex',
-    marginTop: 20
-  };
-
   const toggleVisibility = () => {
     setVisible(!visible);
   };
@@ -46,23 +40,33 @@ const AddEntryForm = forwardRef<EntryFormHandle, Props>(({ onSubmit }, refs) => 
     }
   });
 
-  const addEntry = (event: React.SyntheticEvent) => {
-    event.preventDefault();
-    onSubmit({
-      description,
-      date,
-      specialist,
-      healthCheckRating: Number(healthCheckRating),
-      diagnosisCodes: diagnosisCodes === '' ? [] : diagnosisCodes.split(', '),
-      type: 'HealthCheck'
-    });
-
-    setDescription('');
-    setDate('');
-    setSpecialist('');
-    setHealthCheckRating('');
-    setDiagnosisCodes('');
-  };
+  const getEntryFormByType = (entryType: string) => {
+    switch (entryType) {
+      case "Hospital":
+        return (
+          <HospitalForm
+            onSubmit={onSubmit}
+            toggleVisibility={toggleVisibility}
+          />
+        );
+      case "OccupationalHealthcare":
+        return (
+          <OccupationalHealthcareForm
+            onSubmit={onSubmit}
+            toggleVisibility={toggleVisibility}
+          />
+        );
+      case "HealthCheck":
+        return (
+          <HealthCheckForm
+            onSubmit={onSubmit}
+            toggleVisibility={toggleVisibility}
+          />
+        );
+      default:
+        return <div></div>
+    };
+  }
 
   return (
     <div>
@@ -77,71 +81,20 @@ const AddEntryForm = forwardRef<EntryFormHandle, Props>(({ onSubmit }, refs) => 
         </Button>
       </div>
       <div style={formStyle}>
-        <h4>New HealthCheck entry</h4>
-        <form onSubmit={addEntry}>
-          <div>
-            <TextField
-              fullWidth
-              value={description}
-              label="Description"
-              variant="standard"
-              onChange={({ target }) => setDescription(target.value)}
-            />
-          </div>
-          <div>
-            <TextField
-              fullWidth
-              value={date}
-              label="Date"
-              variant="standard"
-              onChange={({ target }) => setDate(target.value)}
-            />
-          </div>
-          <div>
-            <TextField
-              fullWidth
-              value={specialist}
-              label="Specialist"
-              variant="standard"
-              onChange={({ target }) => setSpecialist(target.value)}
-            />
-          </div>
-          <div>
-            <TextField
-              fullWidth
-              value={healthCheckRating}
-              label="Healthcheck rating"
-              variant="standard"
-              onChange={({ target }) => setHealthCheckRating(target.value)}
-            />
-          </div>
-          <div>
-            <TextField
-              fullWidth
-              value={diagnosisCodes}
-              label="Diagnosis codes"
-              variant="standard"
-              onChange={({ target }) => setDiagnosisCodes(target.value)}
-            />
-          </div>
-          <div style={buttonStyle}>
-            <Button
-              variant="contained"
-              color="error"
-              onClick={toggleVisibility}
-            >
-              Cancel
-            </Button>
-            <Box sx={{ flexGrow: 1 }} />
-            <Button
-              variant="contained"
-              color="primary"
-              type="submit"
-            >
-              Add
-            </Button>
-          </div>
-        </form>
+        <FormControl fullWidth>
+          <InputLabel id="entry-type-label">Entry Type</InputLabel>
+          <Select
+            labelId="entry-type-label"
+            label="Entry Type"
+            value={entryType}
+            onChange={({ target }) => setEntryType(target.value)}
+          >
+            <MenuItem value="Hospital">Hospital</MenuItem>
+            <MenuItem value="OccupationalHealthcare">OccupationalHealthcare</MenuItem>
+            <MenuItem value="HealthCheck">HealthCheck</MenuItem>
+          </Select>
+        </FormControl>
+        {getEntryFormByType(entryType)}
       </div>
     </div>
   )

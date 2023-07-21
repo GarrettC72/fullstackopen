@@ -28,9 +28,9 @@ const parseStringParam = (param: unknown, field: string): string => {
   return param;
 };
 
-const parseDate = (date: unknown): string => {
+const parseDateParam = (date: unknown, field: string): string => {
   if (!isString(date) || !isDate(date)) {
-    throw new Error('Value of dateOfBirth incorrect: ' + date);
+    throw new Error(`Value of ${field} incorrect: ${date}`);
   }
 
   return date;
@@ -68,7 +68,7 @@ const parseDischarge = (discharge: unknown): Discharge => {
   }
 
   return {
-    date: parseDate(discharge.date),
+    date: parseDateParam(discharge.date, "discharge.date"),
     criteria: parseStringParam(discharge.criteria, 'criteria')
   };
 };
@@ -86,8 +86,8 @@ const parseSickLeave = (object: unknown): SickLeave | undefined => {
   }
 
   return {
-    startDate: parseDate(object.sickLeave.startDate),
-    endDate: parseDate(object.sickLeave.endDate)
+    startDate: parseDateParam(object.sickLeave.startDate, "startDate"),
+    endDate: parseDateParam(object.sickLeave.endDate, "endDate")
   };
 };
 
@@ -101,7 +101,7 @@ export const toNewPatient = (object: unknown): NewPatient => {
     const newPatient: NewPatient = {
       name: parseStringParam(object.name, 'name'),
       ssn: parseStringParam(object.ssn, 'ssn'),
-      dateOfBirth: parseDate(object.dateOfBirth),
+      dateOfBirth: parseDateParam(object.dateOfBirth, "dateOfBirth"),
       gender: parseGender(object.gender),
       occupation: parseStringParam(object.occupation, 'occupation'),
       entries: []
@@ -132,7 +132,7 @@ export const toNewEntry = (object: unknown): NewEntry => {
       }
       newEntry = {
         description: parseStringParam(object.description, 'description'),
-        date: parseDate(object.date),
+        date: parseDateParam(object.date, "date"),
         specialist: parseStringParam(object.specialist, 'specialist'),
         diagnosisCodes: parseDiagnosisCodes(object),
         type: 'Hospital',
@@ -145,7 +145,7 @@ export const toNewEntry = (object: unknown): NewEntry => {
       }
       newEntry = {
         description: parseStringParam(object.description, 'description'),
-        date: parseDate(object.date),
+        date: parseDateParam(object.date, "date"),
         specialist: parseStringParam(object.specialist, 'specialist'),
         diagnosisCodes: parseDiagnosisCodes(object),
         type: 'OccupationalHealthcare',
@@ -159,7 +159,7 @@ export const toNewEntry = (object: unknown): NewEntry => {
       }
       newEntry = {
         description: parseStringParam(object.description, 'description'),
-        date: parseDate(object.date),
+        date: parseDateParam(object.date, "date"),
         specialist: parseStringParam(object.specialist, 'specialist'),
         diagnosisCodes: parseDiagnosisCodes(object),
         type: 'HealthCheck',
