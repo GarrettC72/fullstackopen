@@ -1,14 +1,15 @@
 import { useState } from "react";
-import { Box, Button, Checkbox, FormControlLabel, TextField } from "@mui/material";
+import { Box, Button, Checkbox, FormControlLabel, Input, InputLabel, MenuItem, Select, SelectChangeEvent, TextField } from "@mui/material";
 
-import { EntryFormValues } from "../../types";
+import { Diagnosis, EntryFormValues } from "../../types";
 
 interface Props {
   onSubmit: (values: EntryFormValues) => void;
   toggleVisibility: () => void;
+  diagnosisCodeList: Array<Diagnosis['code']>;
 }
 
-const OccupationalHealthcareForm = ({ onSubmit, toggleVisibility }: Props) => {
+const OccupationalHealthcareForm = ({ onSubmit, toggleVisibility, diagnosisCodeList }: Props) => {
   const [description, setDescription] = useState('');
   const [date, setDate] = useState('');
   const [specialist, setSpecialist] = useState('');
@@ -16,12 +17,17 @@ const OccupationalHealthcareForm = ({ onSubmit, toggleVisibility }: Props) => {
   const [sickLeave, setSickLeave] = useState(false);
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
-  const [diagnosisCodes, setDiagnosisCodes] = useState('');
+  const [diagnosisCodes, setDiagnosisCodes] = useState<string[]>([]);
 
   const buttonStyle = {
     display: 'flex',
     marginTop: 20
   };
+
+  const diagnosisCodeOptions = diagnosisCodeList.map(code => ({
+    value: code,
+    label: code
+  }));
 
   const addEntry = (event: React.SyntheticEvent) => {
     event.preventDefault();
@@ -34,7 +40,7 @@ const OccupationalHealthcareForm = ({ onSubmit, toggleVisibility }: Props) => {
         startDate,
         endDate
       },
-      diagnosisCodes: diagnosisCodes === '' ? [] : diagnosisCodes.split(', '),
+      diagnosisCodes,
       type: 'OccupationalHealthcare'
     });
 
@@ -45,8 +51,18 @@ const OccupationalHealthcareForm = ({ onSubmit, toggleVisibility }: Props) => {
     setSickLeave(false);
     setStartDate('');
     setEndDate('');
-    setDiagnosisCodes('');
+    setDiagnosisCodes([]);
   };
+
+  const handleDiagnosisCodesChange = (event: SelectChangeEvent<typeof diagnosisCodes>) => {
+    event.preventDefault();
+    const {
+      target: { value },
+    } = event;
+    setDiagnosisCodes(
+      typeof value === 'string' ? value.split(',') : value
+    );
+  }
 
   return (
     <div>
@@ -61,12 +77,12 @@ const OccupationalHealthcareForm = ({ onSubmit, toggleVisibility }: Props) => {
             onChange={({ target }) => setDescription(target.value)}
           />
         </div>
-        <div>
-          <TextField
+        <div style={{ marginTop: 10 }}>
+          <InputLabel>Date</InputLabel>
+          <Input
             fullWidth
+            type="date"
             value={date}
-            label="Date"
-            variant="standard"
             onChange={({ target }) => setDate(target.value)}
           />
         </div>
@@ -88,6 +104,25 @@ const OccupationalHealthcareForm = ({ onSubmit, toggleVisibility }: Props) => {
             onChange={({ target }) => setEmployerName(target.value)}
           />
         </div>
+        <div style={{ marginTop: 10 }}>
+          <InputLabel>Diagnosis codes</InputLabel>
+          <Select
+            fullWidth
+            value={diagnosisCodes}
+            onChange={handleDiagnosisCodesChange}
+            multiple
+            variant="standard"
+          >
+          {diagnosisCodeOptions.map(option => 
+            <MenuItem
+              key={option.label}
+              value={option.value}
+            >
+              {option.label}
+            </MenuItem>
+          )}
+          </Select>
+        </div>
         <FormControlLabel
           control={
             <Checkbox
@@ -99,32 +134,23 @@ const OccupationalHealthcareForm = ({ onSubmit, toggleVisibility }: Props) => {
           sx={{ mt: 1 }}
         />
         <Box sx={{ ml: '10px' }}>
-          <TextField
+          <InputLabel>start</InputLabel>
+          <Input
             fullWidth
+            type="date"
             value={startDate}
-            label="start"
-            variant="standard"
             onChange={({ target }) => setStartDate(target.value)}
             disabled={!sickLeave}
           />
-          <TextField
+          <InputLabel>end</InputLabel>
+          <Input
             fullWidth
+            type="date"
             value={endDate}
-            label="end"
-            variant="standard"
             onChange={({ target }) => setEndDate(target.value)}
             disabled={!sickLeave}
           />
         </Box>
-        <div>
-          <TextField
-            fullWidth
-            value={diagnosisCodes}
-            label="Diagnosis codes"
-            variant="standard"
-            onChange={({ target }) => setDiagnosisCodes(target.value)}
-          />
-        </div>
         <div style={buttonStyle}>
           <Button
             variant="contained"

@@ -1,20 +1,21 @@
 import { Button, FormControl, InputLabel, MenuItem, Select } from "@mui/material";
 import { forwardRef, useImperativeHandle, useState } from "react";
 
-import { EntryFormValues } from "../../types";
+import { Diagnosis, EntryFormValues } from "../../types";
 import HospitalForm from "./HospitalForm";
 import OccupationalHealthcareForm from "./OccupationalHealthcareForm";
 import HealthCheckForm from "./HealthCheckForm";
 
 interface Props {
   onSubmit: (values: EntryFormValues) => void;
+  diagnosisCodeList: Array<Diagnosis['code']>;
 }
 
 export type EntryFormHandle = {
   toggleVisibility: () => void;
 }
 
-const AddEntryForm = forwardRef<EntryFormHandle, Props>(({ onSubmit }, refs) => {
+const AddEntryForm = forwardRef<EntryFormHandle, Props>(({ onSubmit, diagnosisCodeList }, refs) => {
   const [visible, setVisible] = useState(false);
   const [entryType, setEntryType] = useState('Hospital');
 
@@ -47,6 +48,7 @@ const AddEntryForm = forwardRef<EntryFormHandle, Props>(({ onSubmit }, refs) => 
           <HospitalForm
             onSubmit={onSubmit}
             toggleVisibility={toggleVisibility}
+            diagnosisCodeList={diagnosisCodeList}
           />
         );
       case "OccupationalHealthcare":
@@ -54,6 +56,7 @@ const AddEntryForm = forwardRef<EntryFormHandle, Props>(({ onSubmit }, refs) => 
           <OccupationalHealthcareForm
             onSubmit={onSubmit}
             toggleVisibility={toggleVisibility}
+            diagnosisCodeList={diagnosisCodeList}
           />
         );
       case "HealthCheck":
@@ -61,6 +64,7 @@ const AddEntryForm = forwardRef<EntryFormHandle, Props>(({ onSubmit }, refs) => 
           <HealthCheckForm
             onSubmit={onSubmit}
             toggleVisibility={toggleVisibility}
+            diagnosisCodeList={diagnosisCodeList}
           />
         );
       default:

@@ -1,25 +1,31 @@
 import { useState } from "react";
-import { Box, Button, InputLabel, TextField } from "@mui/material";
+import { Box, Button, Input, InputLabel, MenuItem, Select, SelectChangeEvent, TextField } from "@mui/material";
 
-import { EntryFormValues } from "../../types";
+import { Diagnosis, EntryFormValues } from "../../types";
 
 interface Props {
   onSubmit: (values: EntryFormValues) => void;
   toggleVisibility: () => void;
+  diagnosisCodeList: Array<Diagnosis['code']>;
 }
 
-const HospitalForm = ({ onSubmit, toggleVisibility }: Props) => {
+const HospitalForm = ({ onSubmit, toggleVisibility, diagnosisCodeList }: Props) => {
   const [description, setDescription] = useState('');
   const [date, setDate] = useState('');
   const [specialist, setSpecialist] = useState('');
   const [dischargeDate, setDischargeDate] = useState('');
   const [criteria, setCriteria] = useState('');
-  const [diagnosisCodes, setDiagnosisCodes] = useState('');
+  const [diagnosisCodes, setDiagnosisCodes] = useState<string[]>([]);
 
   const buttonStyle = {
     display: 'flex',
     marginTop: 20
   };
+
+  const diagnosisCodeOptions = diagnosisCodeList.map(code => ({
+    value: code,
+    label: code
+  }));
 
   const addEntry = (event: React.SyntheticEvent) => {
     event.preventDefault();
@@ -31,7 +37,7 @@ const HospitalForm = ({ onSubmit, toggleVisibility }: Props) => {
         date: dischargeDate,
         criteria
       },
-      diagnosisCodes: diagnosisCodes === '' ? [] : diagnosisCodes.split(', '),
+      diagnosisCodes,
       type: 'Hospital'
     });
 
@@ -40,8 +46,18 @@ const HospitalForm = ({ onSubmit, toggleVisibility }: Props) => {
     setSpecialist('');
     setDischargeDate('');
     setCriteria('');
-    setDiagnosisCodes('');
+    setDiagnosisCodes([]);
   };
+
+  const handleDiagnosisCodesChange = (event: SelectChangeEvent<typeof diagnosisCodes>) => {
+    event.preventDefault();
+    const {
+      target: { value },
+    } = event;
+    setDiagnosisCodes(
+      typeof value === 'string' ? value.split(',') : value
+    );
+  }
 
   return (
     <div>
@@ -56,12 +72,12 @@ const HospitalForm = ({ onSubmit, toggleVisibility }: Props) => {
             onChange={({ target }) => setDescription(target.value)}
           />
         </div>
-        <div>
-          <TextField
+        <div style={{ marginTop: 10 }}>
+          <InputLabel>Date</InputLabel>
+          <Input
             fullWidth
+            type="date"
             value={date}
-            label="Date"
-            variant="standard"
             onChange={({ target }) => setDate(target.value)}
           />
         </div>
@@ -74,13 +90,33 @@ const HospitalForm = ({ onSubmit, toggleVisibility }: Props) => {
             onChange={({ target }) => setSpecialist(target.value)}
           />
         </div>
+        <div style={{ marginTop: 10 }}>
+          <InputLabel>Diagnosis codes</InputLabel>
+          <Select
+            label="Diagnosis codes"
+            fullWidth
+            value={diagnosisCodes}
+            onChange={handleDiagnosisCodesChange}
+            multiple
+            variant="standard"
+          >
+          {diagnosisCodeOptions.map(option => 
+            <MenuItem
+              key={option.label}
+              value={option.value}
+            >
+              {option.label}
+            </MenuItem>
+          )}
+          </Select>
+        </div>
         <InputLabel sx={{ mt: 2 }}>Discharge</InputLabel>
         <Box sx={{ ml: '10px' }}>
-          <TextField
+          <InputLabel>date</InputLabel>
+          <Input
             fullWidth
+            type="date"
             value={dischargeDate}
-            label="date"
-            variant="standard"
             onChange={({ target }) => setDischargeDate(target.value)}
           />
           <TextField
@@ -91,15 +127,6 @@ const HospitalForm = ({ onSubmit, toggleVisibility }: Props) => {
             onChange={({ target }) => setCriteria(target.value)}
           />
         </Box>
-        <div>
-          <TextField
-            fullWidth
-            value={diagnosisCodes}
-            label="Diagnosis codes"
-            variant="standard"
-            onChange={({ target }) => setDiagnosisCodes(target.value)}
-          />
-        </div>
         <div style={buttonStyle}>
           <Button
             variant="contained"

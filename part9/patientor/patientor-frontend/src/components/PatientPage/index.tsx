@@ -104,6 +104,7 @@ const PatientPage = ({ diagnoses }: Props) => {
       <AddEntryForm
         onSubmit={createEntry}
         ref={entryFormRef}
+        diagnosisCodeList={diagnoses.map(d => d.code)}
       />
       <h3>entries</h3>
       {patient.entries.map(entry =>

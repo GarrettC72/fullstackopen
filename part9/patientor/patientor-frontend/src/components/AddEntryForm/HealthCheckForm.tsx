@@ -1,24 +1,37 @@
 import { useState } from "react";
-import { Box, Button, TextField } from "@mui/material";
+import { Box, Button, Input, InputLabel, MenuItem, Select, SelectChangeEvent, TextField } from "@mui/material";
 
-import { EntryFormValues } from "../../types";
+import { Diagnosis, EntryFormValues } from "../../types";
 
 interface Props {
   onSubmit: (values: EntryFormValues) => void;
   toggleVisibility: () => void;
+  diagnosisCodeList: Array<Diagnosis['code']>;
 }
 
-const HealthCheckForm = ({ onSubmit, toggleVisibility }: Props) => {
+const HealthCheckForm = ({ onSubmit, toggleVisibility, diagnosisCodeList }: Props) => {
   const [description, setDescription] = useState('');
   const [date, setDate] = useState('');
   const [specialist, setSpecialist] = useState('');
-  const [healthCheckRating, setHealthCheckRating] = useState('');
-  const [diagnosisCodes, setDiagnosisCodes] = useState('');
+  const [healthCheckRating, setHealthCheckRating] = useState(0);
+  const [diagnosisCodes, setDiagnosisCodes] = useState<string[]>([]);
 
   const buttonStyle = {
     display: 'flex',
     marginTop: 20
   };
+
+  const diagnosisCodeOptions = diagnosisCodeList.map(code => ({
+    value: code,
+    label: code
+  }));
+
+  const healthCheckRatingOptions = [
+    { label: "Healthy", value: 0 },
+    { label: "Low Risk", value: 1 },
+    { label: "High Risk", value: 2 },
+    { label: "Critical Risk", value: 3 }
+  ];
 
   const addEntry = (event: React.SyntheticEvent) => {
     event.preventDefault();
@@ -26,17 +39,34 @@ const HealthCheckForm = ({ onSubmit, toggleVisibility }: Props) => {
       description,
       date,
       specialist,
-      healthCheckRating: Number(healthCheckRating),
-      diagnosisCodes: diagnosisCodes === '' ? [] : diagnosisCodes.split(', '),
+      healthCheckRating,
+      diagnosisCodes,
       type: 'HealthCheck'
     });
 
     setDescription('');
     setDate('');
     setSpecialist('');
-    setHealthCheckRating('');
-    setDiagnosisCodes('');
+    setHealthCheckRating(0);
+    setDiagnosisCodes([]);
   };
+
+  const onDiagnosisCodesChange = (event: SelectChangeEvent<typeof diagnosisCodes>) => {
+    event.preventDefault();
+    const {
+      target: { value },
+    } = event;
+    setDiagnosisCodes(
+      typeof value === 'string' ? value.split(',') : value
+    );
+  }
+
+  const onHealthCheckRatingChange = (event: SelectChangeEvent<typeof healthCheckRating>) => {
+    event.preventDefault();
+    if (typeof event.target.value === 'number') {
+      setHealthCheckRating(event.target.value);
+    }
+  }
 
   return (
     <div>
@@ -51,12 +81,12 @@ const HealthCheckForm = ({ onSubmit, toggleVisibility }: Props) => {
             onChange={({ target }) => setDescription(target.value)}
           />
         </div>
-        <div>
-          <TextField
+        <div style={{ marginTop: 10 }}>
+          <InputLabel>Date</InputLabel>
+          <Input
             fullWidth
+            type="date"
             value={date}
-            label="Date"
-            variant="standard"
             onChange={({ target }) => setDate(target.value)}
           />
         </div>
@@ -69,23 +99,42 @@ const HealthCheckForm = ({ onSubmit, toggleVisibility }: Props) => {
             onChange={({ target }) => setSpecialist(target.value)}
           />
         </div>
-        <div>
-          <TextField
-            fullWidth
-            value={healthCheckRating}
-            label="Healthcheck rating"
-            variant="standard"
-            onChange={({ target }) => setHealthCheckRating(target.value)}
-          />
-        </div>
-        <div>
-          <TextField
+        <div style={{ marginTop: 10 }}>
+          <InputLabel>Diagnosis codes</InputLabel>
+          <Select
             fullWidth
             value={diagnosisCodes}
-            label="Diagnosis codes"
+            onChange={onDiagnosisCodesChange}
+            multiple
             variant="standard"
-            onChange={({ target }) => setDiagnosisCodes(target.value)}
-          />
+          >
+          {diagnosisCodeOptions.map(option => 
+            <MenuItem
+              key={option.label}
+              value={option.value}
+            >
+              {option.label}
+            </MenuItem>
+          )}
+          </Select>
+        </div>
+        <div style={{ marginTop: 10 }}>
+          <InputLabel>HealthCheckRating</InputLabel>
+          <Select
+            fullWidth
+            value={healthCheckRating}
+            onChange={onHealthCheckRatingChange}
+            variant="standard"
+          >
+            {healthCheckRatingOptions.map(option => 
+            <MenuItem
+              key={option.label}
+              value={option.value}
+            >
+              {option.label}
+            </MenuItem>
+          )}
+          </Select>
         </div>
         <div style={buttonStyle}>
           <Button
